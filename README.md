@@ -1,6 +1,6 @@
-# Project Name
+# Recommendation
 
-The project description
+This is the Recommendtion Service for Model AirBnb.
 
 ## Roadmap
 
