@@ -1,11 +1,11 @@
 module.exports.knex = require('knex')({
   client: 'pg',
   connection: {
-    host: '127.0.0.1',
-    port: '5432',
-    user: 'tyler',
-    password: '',
-    database: 'Recommendation',
+    host: process.env.PGHOST || '127.0.0.1',
+    port: process.env.PORT || '5432',
+    user: process.env.PGUSER || 'tyler',
+    password: process.env.PGPASSWORD || '',
+    database: process.env.PGDATABASE || 'Recommendation',
     charset: 'utf8',
   },
 });
