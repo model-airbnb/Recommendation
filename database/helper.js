@@ -1,22 +1,53 @@
-const model = require('../database/models');
+const { client } = require('./client');
 
 module.exports.addBookingDetail = (obj) => {
   const {
-    listingId, searchId, neighbourhood, roomType, nightlyPrices,
+    listingId, searchId, neighbourhood, roomType, nightlyPrices, market, averageRating,
   } = obj;
-  const bookingObj = {
-    listing_id: listingId, market: 'San Francisco', neighborhood: neighbourhood, room_type: roomType, review_scores_rating: Math.floor(Math.random() * 100),
+  const bookingText = `INSERT INTO listings (listing_id, market, neighbourhood, room_type, review_scores_rating) 
+    VALUES (${listingId}, '${market}', '${neighbourhood}', '${roomType}', ${averageRating}) 
+    ON CONFLICT (listing_id) DO NOTHING`;
+  return client.query(bookingText)
+    .then(() => {
+      const nightlyEntries = nightlyPrices.map((night) => {
+        const nightlyText = `INSERT INTO booked_nights (listing_id, booked_at, price, search_id) 
+          VALUES (${listingId},'${night.date}'::date,${night.price},${searchId}) `;
+        return client.query(nightlyText);
+      });
+      return Promise.all(nightlyEntries);
+    });
+};
+
+module.exports.addSearchQuery = (obj) => {
+  const {
+    searchQueryId, searched_at, market, checkIn, checkOut, roomType, maxPrice,
+  } = obj;
+  const queryObj = {
+    search_id: searchQueryId,
+    market,
+    searched_at,
+    check_in: checkIn,
+    check_out: checkOut,
+    room_type: roomType,
+    max_price: maxPrice,
   };
-  const nightlyEntries = nightlyPrices.map((nightlyPrice) => {
-    const nightlyObj = {
-      listing_id: listingId,
-      date: nightlyPrice.date,
-      price: nightlyPrice.price,
-      search_id: searchId,
+
+ // return model.SearchQueries.forge(queryObj).save();
+};
+
+module.exports.addSearchResult = (obj) => {
+  const {
+    searchQueryId, availableListings, scoringRules,
+  } = obj;
+  const results = availableListings.map((result) => {
+    const resultObj = {
+      search_id: searchQueryId,
+      listing_id: result.listingId,
+      scoring_rules: JSON.stringify(scoringRules),
     };
-    return model.NightlyPrices.forge(nightlyObj).save();
+
+ //   return model.SearchResults.forge(resultObj).save();
   });
 
-  return Promise.all(nightlyEntries)
-    .then(model.BookingDetails.forge(bookingObj).save());
+  return Promise.all(results);
 };
