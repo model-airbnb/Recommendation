@@ -40,7 +40,7 @@ const generateSingleBooking = (listingId, offset = 1) => {
   };
 };
 
-const generateBookingDetails = async (start = 1000000, finish = 1100000) => {
+const generateBookingDetails = async (start = 1000000, finish = 2000000) => {
   for (let i = start; i < finish; i += 1) {
     for (let j = 1; j <= 99; j += 7) {
       await addBookingDetail(generateSingleBooking(i, j));
