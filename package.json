@@ -35,9 +35,7 @@
   },
   "dependencies": {
     "body-parser": "^1.17.0",
-    "bookshelf": "^0.10.4",
     "express": "^4.15.0",
-    "knex": "^0.13.0",
     "pg": "^7.3.0"
   }
 }
