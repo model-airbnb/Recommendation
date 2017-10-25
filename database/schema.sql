@@ -1,4 +1,3 @@
--- psql -U tyler -d Recommendation -a -f database/schema.sql
 DROP DATABASE IF EXISTS recommendation;
 CREATE DATABASE recommendation;
 
@@ -23,7 +22,7 @@ CREATE TABLE search_queries (
 CREATE TABLE search_results (
   search_id INT NOT NULL REFERENCES search_queries(search_id),
   listing_id INT NOT NULL REFERENCES listings(listing_id),
-  scoring_rules TEXT
+  scoring_rules JSON
 );
 
 CREATE TABLE booked_nights (
@@ -31,7 +30,6 @@ CREATE TABLE booked_nights (
   booked_at DATE NOT NULL,
   price MONEY,
   search_id INT NOT NULL 
--- // REFERENCES search_queries(search_id)
 );
 CREATE TABLE rules (
   id SERIAL UNIQUE NOT NULL PRIMARY KEY,

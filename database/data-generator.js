@@ -1,6 +1,6 @@
 const { addBookingDetail, addSearchQuery, addSearchResult } = require('./helper');
 
-const neighbourhoods = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown/Civic Center',
+const NEIGHBOURHOODS = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown/Civic Center',
   'Diamond Heights', 'Lakeshore', 'Russian Hill', 'Noe Valley', 'Inner Sunset', 'Outer Richmond',
   'Crocker Amazon', 'Excelsior', 'Parkside', 'Financial District', 'Ocean View', 'Mission',
   'West of Twin Peaks', 'Inner Richmond', 'Marina', 'Bayview', 'Pacific Heights',
@@ -8,42 +8,46 @@ const neighbourhoods = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown
   'Chinatown', 'North Beach', 'Nob Hill', 'Outer Sunset', 'Western Addition',
   'Golden Gate Park', 'Visitacion Valley'];
 
-const roomType = ['Private room', 'Entire home/apt', 'Shared room'];
+const ROOMTYPE = ['Private room', 'Entire home/apt', 'Shared room'];
 
-const startDate = '2018-09-01T23:59:59Z';
+const STARTDATE = '2018-09-01T23:59:59Z';
+
+const USER_ID_RANGE = 100000;
+const SEARCH_ID_OFFSET = 5000000;
+const MAX_NIGHTLY_PRICE = 300;
 
 const generateNightlyPrices = (numNights, price = 100, offset = 1) => {
-  const nightsArray = [];
+  const bookedNights = [];
   for (let i = 0; i < numNights; i += 1) {
-    const date = new Date(startDate);
+    const date = new Date(STARTDATE);
     date.setDate(i + offset);
-    const obj = {
+    const bookedNight = {
       date: date.toISOString().split('T')[0],
       price: date.getDay() >= 5 ? price * 1.25 : price,
     };
-    nightsArray.push(obj);
+    bookedNights.push(bookedNight);
   }
-  return nightsArray;
+  return bookedNights;
 };
 
 const generateSingleBooking = (listingId, offset = 1) => {
-  const nightlyPrice = (listingId % 300) + 50;
+  const nightlyPrice = (listingId % MAX_NIGHTLY_PRICE) + 50;
   return {
     listingId,
-    userId: Math.floor(Math.random() * 100000),
-    searchId: listingId + offset + 5000000,
+    userId: Math.floor(Math.random() * USER_ID_RANGE),
+    searchId: listingId + offset + SEARCH_ID_OFFSET,
     market: 'San Francisco',
-    neighbourhood: neighbourhoods[listingId % 33],
-    roomType: roomType[listingId % 3],
+    neighbourhood: NEIGHBOURHOODS[listingId % NEIGHBOURHOODS.length],
+    roomType: ROOMTYPE[listingId % ROOMTYPE.length],
     averageRating: listingId % 100,
-    nightlyPrices: generateNightlyPrices(Math.floor(Math.random() * 6) + 1, nightlyPrice, offset),
+    nightlyPrices: generateNightlyPrices(Math.ceil(Math.random() * 6), nightlyPrice, offset),
   };
 };
 
 const generateBookingDetails = async (start = 1000000, finish = 2000000) => {
-  for (let i = start; i < finish; i += 1) {
-    for (let j = 1; j <= 99; j += 7) {
-      await addBookingDetail(generateSingleBooking(i, j));
+  for (let listingId = start; listingId < finish; listingId += 1) {
+    for (let startingWeek = 1; startingWeek <= 99; startingWeek += 7) {
+      await addBookingDetail(generateSingleBooking(listingId, startingWeek));
     }
   }
 };

@@ -11,7 +11,7 @@ module.exports.addBookingDetail = (obj) => {
     .then(() => {
       const nightlyEntries = nightlyPrices.map((night) => {
         const nightlyText = `INSERT INTO booked_nights (listing_id, booked_at, price, search_id) 
-          VALUES (${listingId},'${night.date}'::date,${night.price},${searchId}) `;
+          VALUES (${listingId}, '${night.date}'::date, ${night.price}, ${searchId})`;
         return client.query(nightlyText);
       });
       return Promise.all(nightlyEntries);
@@ -20,10 +20,10 @@ module.exports.addBookingDetail = (obj) => {
 
 module.exports.addSearchQuery = (obj) => {
   const {
-    searchQueryId, timestamp, market, checkIn, checkOut, roomType, maxPrice,
+    searchQueryId, timestamp, market, checkIn, checkOut, roomType,
   } = obj;
-  const queryText = `INSERT INTO listings (search_id, market, searched_at, check_in, check_out, room_type, max_price) 
-    VALUES (${searchQueryId}, '${market}', '${timestamp}', '${checkIn}', '${checkOut}',  '${roomType}', ${maxPrice}) 
+  const queryText = `INSERT INTO listings (search_id, market, searched_at, check_in, check_out, room_type) 
+    VALUES (${searchQueryId}, '${market}', '${timestamp}', '${checkIn}', '${checkOut}',  '${roomType}') 
     ON CONFLICT (search_id) DO NOTHING`;
 
   return client.query(queryText);
@@ -35,7 +35,7 @@ module.exports.addSearchResult = (obj) => {
   } = obj;
   const results = availableListings.map((result) => {
     const resultText = `INSERT INTO listings (search_id, listing_id, scoring_rules) 
-      VALUES (${searchQueryId}, '${result.listingId}', '${JSON.stringify(scoringRules)}') 
+      VALUES (${searchQueryId}, '${result.listingId}', '${scoringRules}'::json) 
       ON CONFLICT DO NOTHING`;
 
     return client.query(resultText);
