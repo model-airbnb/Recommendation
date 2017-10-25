@@ -20,19 +20,13 @@ module.exports.addBookingDetail = (obj) => {
 
 module.exports.addSearchQuery = (obj) => {
   const {
-    searchQueryId, searched_at, market, checkIn, checkOut, roomType, maxPrice,
+    searchQueryId, timestamp, market, checkIn, checkOut, roomType, maxPrice,
   } = obj;
-  const queryObj = {
-    search_id: searchQueryId,
-    market,
-    searched_at,
-    check_in: checkIn,
-    check_out: checkOut,
-    room_type: roomType,
-    max_price: maxPrice,
-  };
+  const queryText = `INSERT INTO listings (search_id, market, searched_at, check_in, check_out, room_type, max_price) 
+    VALUES (${searchQueryId}, '${market}', '${timestamp}', '${checkIn}', '${checkOut}',  '${roomType}', ${maxPrice}) 
+    ON CONFLICT (search_id) DO NOTHING`;
 
- // return model.SearchQueries.forge(queryObj).save();
+  return client.query(queryText);
 };
 
 module.exports.addSearchResult = (obj) => {
@@ -40,13 +34,11 @@ module.exports.addSearchResult = (obj) => {
     searchQueryId, availableListings, scoringRules,
   } = obj;
   const results = availableListings.map((result) => {
-    const resultObj = {
-      search_id: searchQueryId,
-      listing_id: result.listingId,
-      scoring_rules: JSON.stringify(scoringRules),
-    };
+    const resultText = `INSERT INTO listings (search_id, listing_id, scoring_rules) 
+      VALUES (${searchQueryId}, '${result.listingId}', '${JSON.stringify(scoringRules)}') 
+      ON CONFLICT DO NOTHING`;
 
- //   return model.SearchResults.forge(resultObj).save();
+    return client.query(resultText);
   });
 
   return Promise.all(results);
