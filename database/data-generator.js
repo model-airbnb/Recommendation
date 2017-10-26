@@ -1,4 +1,4 @@
-const { addBookingDetail, addSearchQuery, addSearchResult, addElasticBookingDetail } = require('./helper');
+const { addBookingDetail, addSearchQuery, addSearchResult, addElasticBookingDetail, addBookingObj, addBulkElasticBookingDetail } = require('./helper');
 
 const NEIGHBOURHOODS = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown/Civic Center',
   'Diamond Heights', 'Lakeshore', 'Russian Hill', 'Noe Valley', 'Inner Sunset', 'Outer Richmond',
@@ -50,8 +50,25 @@ const generateSingleBooking = (listingId, offset = 1) => {
 const generateBookingDetails = async (start = 1000000, finish = 2000000) => {
   for (let listingId = start; listingId < finish; listingId += 1) {
     for (let startingDay = 5; startingDay <= 129; startingDay += 7) {
-      await addElasticBookingDetail(generateSingleBooking(listingId, startingDay + Math.floor(Math.random() * NIGHTS_UNBOOKED_RANGE)));
+      const randomStartingDay = startingDay + Math.floor(Math.random() * NIGHTS_UNBOOKED_RANGE);
+      await addBookingDetail(generateSingleBooking(listingId, randomStartingDay));
     }
   }
 };
-generateBookingDetails();
+
+const generateElasticBookingDetails = async (start = 1000000, finish = 2000000) => {
+  let bulk = [];
+  for (let listingId = start; listingId < finish; listingId += 1) {
+    for (let startingDay = 5; startingDay <= 129; startingDay += 7) {
+      const randomStartingDay = startingDay + Math.floor(Math.random() * NIGHTS_UNBOOKED_RANGE);
+      bulk = bulk.concat(addBookingObj(generateSingleBooking(listingId, randomStartingDay)));
+    }
+    if (listingId % 1000 === 0) {
+      await addBulkElasticBookingDetail(bulk)
+        .then(() => { bulk = []; })
+        .catch(err => console.log(err));
+    }
+  }
+};
+
+generateElasticBookingDetails();
