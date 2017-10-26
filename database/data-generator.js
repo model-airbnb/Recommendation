@@ -10,7 +10,7 @@ const NEIGHBOURHOODS = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown
 
 const ROOMTYPE = ['Private room', 'Entire home/apt', 'Shared room'];
 
-const STARTDATE = '2017-09-01T23:59:59Z';
+const STARTDATE = '2017-10-01T23:59:59Z';
 
 const USER_ID_RANGE = 100000;
 const SEARCH_ID_OFFSET = 5000000;
