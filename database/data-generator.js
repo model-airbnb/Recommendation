@@ -1,4 +1,4 @@
-const { addBookingDetail, addSearchQuery, addSearchResult } = require('./helper');
+const { addBookingDetail, addSearchQuery, addSearchResult, addElasticBookingDetail } = require('./helper');
 
 const NEIGHBOURHOODS = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown/Civic Center',
   'Diamond Heights', 'Lakeshore', 'Russian Hill', 'Noe Valley', 'Inner Sunset', 'Outer Richmond',
@@ -10,7 +10,7 @@ const NEIGHBOURHOODS = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown
 
 const ROOMTYPE = ['Private room', 'Entire home/apt', 'Shared room'];
 
-const STARTDATE = '2018-09-01T23:59:59Z';
+const STARTDATE = '2017-09-01T23:59:59Z';
 
 const USER_ID_RANGE = 100000;
 const SEARCH_ID_OFFSET = 5000000;
@@ -47,10 +47,9 @@ const generateSingleBooking = (listingId, offset = 1) => {
 const generateBookingDetails = async (start = 1000000, finish = 2000000) => {
   for (let listingId = start; listingId < finish; listingId += 1) {
     for (let startingWeek = 1; startingWeek <= 99; startingWeek += 7) {
-      await addBookingDetail(generateSingleBooking(listingId, startingWeek));
+      await addElasticBookingDetail(generateSingleBooking(listingId, startingWeek));
     }
   }
 };
 
 generateBookingDetails();
-
