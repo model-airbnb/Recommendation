@@ -15,6 +15,8 @@ const STARTDATE = '2017-10-01T23:59:59Z';
 const USER_ID_RANGE = 100000;
 const SEARCH_ID_OFFSET = 5000000;
 const MAX_NIGHTLY_PRICE = 300;
+const NIGHTS_BOOKED_RANGE = 4;
+const NIGHTS_UNBOOKED_RANGE = 7 - NIGHTS_BOOKED_RANGE + 1;
 
 const generateNightlyPrices = (numNights, price = 100, offset = 1) => {
   const bookedNights = [];
@@ -40,14 +42,14 @@ const generateSingleBooking = (listingId, offset = 1) => {
     neighbourhood: NEIGHBOURHOODS[listingId % NEIGHBOURHOODS.length],
     roomType: ROOMTYPE[listingId % ROOMTYPE.length],
     averageRating: listingId % 100,
-    nightlyPrices: generateNightlyPrices(Math.ceil(Math.random() * 6), nightlyPrice, offset),
+    nightlyPrices: generateNightlyPrices(Math.ceil(Math.random() * NIGHTS_BOOKED_RANGE), nightlyPrice, offset),
   };
 };
 
 const generateBookingDetails = async (start = 1000000, finish = 2000000) => {
   for (let listingId = start; listingId < finish; listingId += 1) {
-    for (let startingWeek = 1; startingWeek <= 99; startingWeek += 7) {
-      await addElasticBookingDetail(generateSingleBooking(listingId, startingWeek));
+    for (let startingDay = 5; startingDay <= 129; startingDay += 7) {
+      await addElasticBookingDetail(generateSingleBooking(listingId, startingDay + Math.floor(Math.random()*NIGHTS_UNBOOKED_RANGE)));
     }
   }
 };
