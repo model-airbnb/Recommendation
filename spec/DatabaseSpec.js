@@ -2,9 +2,9 @@
 const { expect } = require('chai');
 
 const {
-  getListingsByType,
+  getListingAttributeValues,
   getBookedNightsByDay,
-  getListingByCategory,
+  getListingByAttribute,
   getNumberOfBookedNightsByPrice,
   getBookedNightsByListing,
   getAllInfoAboutListingCategory,
@@ -13,7 +13,7 @@ const {
 describe('Database Spec', () => {
   describe('Listings Table', () => {
     it('Should get listings by type', (done) => {
-      getListingsByType('market')
+      getListingAttributeValues('market')
         .then((listings) => {
           expect(listings.rows[0].market).to.equal('San Francisco');
           done();
@@ -27,7 +27,7 @@ describe('Database Spec', () => {
         });
     }).timeout(50000);
     it('Should get listings by category', (done) => {
-      getListingByCategory('listing_id', 1053031)
+      getListingByAttribute('listing_id', 1053031)
         .then((listings) => {
           expect(listings.rows[0].listing_id).to.equal(1053031);
           done();

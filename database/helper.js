@@ -132,13 +132,11 @@ module.exports.addBulkElasticBookingDetail = (array) => {
 
 // QUERIES
 
-module.exports.getListingsByType = (string) => {
-  let param = string;
-  if (!param) {
-    param = '*';
-  }
+module.exports.getListingAttributeValues = (string) => {
+  const param = string || '*';
+
   const queryText = `SELECT ${param} FROM listings`;
-  return client.query(queryText).catch(err => console.log('getListingsByType', err));
+  return client.query(queryText).catch(err => console.log('getListingAttributeValues', err));
 };
 
 module.exports.getBookedNightsByDay = (day) => {
@@ -147,10 +145,10 @@ module.exports.getBookedNightsByDay = (day) => {
   return client.query(queryText).catch(err => console.log('getBookedNightsByDay', err));
 };
 
-module.exports.getListingByCategory = (category, string) => {
+module.exports.getListingByAttribute = (category, string) => {
   const queryText = `SELECT * FROM listings WHERE ${category} = ${string}`;
 
-  return client.query(queryText).catch(err => console.log('getListingByCategory', err));
+  return client.query(queryText).catch(err => console.log('getListingByAttribute', err));
 };
 
 module.exports.getNumberOfBookedNightsByPrice = (minPrice, maxPrice, startDate, endDate) => {
