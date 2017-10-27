@@ -117,42 +117,37 @@ module.exports.getListingsByType = (string) => {
   if (!param) {
     param = '*';
   }
-  const queryText = `SELECT ${string} FROM listings`;
-
-  return client.query(queryText);
+  const queryText = `SELECT ${param} FROM listings`;
+  return client.query(queryText).catch(err => console.log('getListingsByType', err));
 };
 
-module.exports.getBookedNightsByType = (string) => {
-  let param = string;
-  if (!param) {
-    param = '*';
-  }
-  const queryText = `SELECT ${string} FROM booked_nights`;
+module.exports.getBookedNightsByDay = (day) => {
+  const queryText = `SELECT * FROM booked_nights WHERE booked_at = '${day}' `;
 
-  return client.query(queryText);
+  return client.query(queryText).catch(err => console.log('getBookedNightsByDay', err));
 };
 
 module.exports.getListingByCategory = (category, string) => {
   const queryText = `SELECT * FROM listings WHERE ${category} = ${string}`;
 
-  return client.query(queryText);
+  return client.query(queryText).catch(err => console.log('getListingByCategory', err));
 };
 
 module.exports.getNumberOfBookedNightsByPrice = (minPrice, maxPrice) => {
-  const queryText = `SELECT count(*) FROM booked_nights WHERE price >= ${minPrice} AND price <= ${maxPrice}`;
+  const queryText = `SELECT count(*) FROM booked_nights WHERE price::money::numeric::float8 >= ${minPrice} AND price::money::numeric::float8 <= ${maxPrice}`;
 
-  return client.query(queryText);
+  return client.query(queryText).catch(err => console.log('getNumberOfBookedNightsByPrice', err));
 };
 
 module.exports.getBookedNightsByListing = (listingId) => {
   const queryText = `SELECT * FROM booked_nights WHERE listing_id = ${listingId}`;
 
-  return client.query(queryText);
+  return client.query(queryText).catch(err => console.log('getBookedNightsByListing', err));
 };
 
 module.exports.getAllInfoAboutListingCategory = (category, parameter) => {
   const queryText = `SELECT * FROM listings INNER JOIN booked_nights ON listings.listing_id = booked_nights.listing_id WHERE listings.${category} = ${parameter}`;
 
-  return client.query(queryText);
+  return client.query(queryText).catch(err => console.log('getAllInfoAboutListingCategory', err));
 };
 
