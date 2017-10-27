@@ -19,6 +19,8 @@ CREATE TABLE search_queries (
   check_out DATE NOT NULL
 );
 
+CREATE INDEX searched_at_idx ON search_queries (searched_at);
+
 CREATE TABLE search_results (
   search_id INT NOT NULL REFERENCES search_queries(search_id),
   listing_id INT NOT NULL REFERENCES listings(listing_id),
@@ -29,8 +31,11 @@ CREATE TABLE booked_nights (
   listing_id INT NOT NULL REFERENCES listings(listing_id),
   booked_at DATE NOT NULL,
   price MONEY,
-  search_id INT NOT NULL 
+  search_id INT NOT NULL
 );
+
+CREATE INDEX booked_at_idx ON booked_nights (booked_at);
+
 CREATE TABLE rules (
   id SERIAL UNIQUE NOT NULL PRIMARY KEY,
   room_type VARCHAR(50),

@@ -1,4 +1,4 @@
-const { addBookingDetail, addSearchQuery, addSearchResult, addElasticBookingDetail, addBookingObj, addBulkElasticBookingDetail } = require('./helper');
+const { addBookingDetail, addSearchQuery, addSearchResult, addElasticBookingDetail, addBookingObj, addBulkElasticBookingDetail, addBookingPrep, addBookingDetailBulk } = require('./helper');
 
 const NEIGHBOURHOODS = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown/Civic Center',
   'Diamond Heights', 'Lakeshore', 'Russian Hill', 'Noe Valley', 'Inner Sunset', 'Outer Richmond',
@@ -48,13 +48,42 @@ const generateSingleBooking = (listingId, offset = 1) => {
 };
 
 const generateBookingDetails = async (start = 1000000, finish = 2000000) => {
+  let bulk = [];
   for (let listingId = start; listingId < finish; listingId += 1) {
     for (let startingDay = 5; startingDay <= 129; startingDay += 7) {
       const randomStartingDay = startingDay + Math.floor(Math.random() * NIGHTS_UNBOOKED_RANGE);
-      await addBookingDetail(generateSingleBooking(listingId, randomStartingDay));
+      bulk.push(addBookingDetail(generateSingleBooking(listingId, randomStartingDay)));
+    }
+    if (listingId % 10000 === 0) {
+      await Promise.all(bulk)
+        .then(() => { bulk = []; })
+        .catch(err => console.log(err));
     }
   }
 };
+
+
+const generateBulkBookingDetails = async (start = 1900000, finish = 2000000) => {
+  let bulkBooking = [];
+  let bulkNightly = [];
+  for (let listingId = start; listingId < finish; listingId += 1) {
+    for (let startingDay = 5; startingDay <= 129; startingDay += 7) {
+      const randomStartingDay = startingDay + Math.floor(Math.random() * NIGHTS_UNBOOKED_RANGE);
+      const bulk = addBookingPrep(generateSingleBooking(listingId, randomStartingDay));
+      bulkBooking.push(bulk[0]);
+      bulkNightly.push(bulk[1]);
+    }
+    if (listingId % 10000 === 0) {
+      await addBookingDetailBulk(bulkBooking, bulkNightly)
+        .then(() => {
+          bulkBooking = [];
+          bulkNightly = [];
+        })
+        .catch(err => console.log(err));
+    }
+  }
+};
+
 
 const generateElasticBookingDetails = async (start = 1000000, finish = 2000000) => {
   let bulk = [];
@@ -63,7 +92,7 @@ const generateElasticBookingDetails = async (start = 1000000, finish = 2000000) 
       const randomStartingDay = startingDay + Math.floor(Math.random() * NIGHTS_UNBOOKED_RANGE);
       bulk = bulk.concat(addBookingObj(generateSingleBooking(listingId, randomStartingDay)));
     }
-    if (listingId % 1000 === 0) {
+    if (listingId % 10000 === 0) {
       await addBulkElasticBookingDetail(bulk)
         .then(() => { bulk = []; })
         .catch(err => console.log(err));
@@ -71,4 +100,6 @@ const generateElasticBookingDetails = async (start = 1000000, finish = 2000000) 
   }
 };
 
+generateBookingDetails();
+generateBulkBookingDetails();
 generateElasticBookingDetails();
