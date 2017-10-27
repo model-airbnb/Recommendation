@@ -20,6 +20,26 @@ module.exports.addBookingDetail = (obj) => {
     });
 };
 
+module.exports.addBookingPrep = (obj) => {
+  const {
+    listingId, searchId, neighbourhood, roomType, nightlyPrices, market, averageRating,
+  } = obj;
+  const bookingText = `(${listingId}, '${market}', '${neighbourhood}', '${roomType}', ${averageRating})`;
+
+  const nightlyEntries = nightlyPrices.map(night => (
+    `(${listingId}, '${night.date}'::date, ${night.price}, ${searchId})`
+  ));
+
+  return [bookingText, nightlyEntries];
+};
+
+module.exports.addBookingDetailBulk = (bookingArray, nightlyArray) => {
+  const bookingText = `INSERT INTO listings (listing_id, market, neighbourhood, room_type, review_scores_rating) VALUES ${bookingArray.join(', ')} ON CONFLICT (listing_id) DO NOTHING`;
+  const nightlyText = `INSERT INTO booked_nights (listing_id, booked_at, price, search_id) VALUES ${nightlyArray.join(', ')}`;
+
+  return client.query(bookingText).then(client.query(nightlyText)).catch(err => console.log(err));
+};
+
 module.exports.addSearchQuery = (obj) => {
   const {
     searchQueryId, timestamp, market, checkIn, checkOut, roomType,
@@ -133,20 +153,20 @@ module.exports.getListingByCategory = (category, string) => {
   return client.query(queryText).catch(err => console.log('getListingByCategory', err));
 };
 
-module.exports.getNumberOfBookedNightsByPrice = (minPrice, maxPrice) => {
-  const queryText = `SELECT count(*) FROM booked_nights WHERE price::money::numeric::float8 >= ${minPrice} AND price::money::numeric::float8 <= ${maxPrice}`;
+module.exports.getNumberOfBookedNightsByPrice = (minPrice, maxPrice, startDate, endDate) => {
+  const queryText = `SELECT count(*) FROM booked_nights WHERE price::money::numeric::float8 >= ${minPrice} AND price::money::numeric::float8 <= ${maxPrice} AND booked_at >= '${startDate}' AND booked_at <= '${endDate}'`;
 
   return client.query(queryText).catch(err => console.log('getNumberOfBookedNightsByPrice', err));
 };
 
-module.exports.getBookedNightsByListing = (listingId) => {
-  const queryText = `SELECT * FROM booked_nights WHERE listing_id = ${listingId}`;
+module.exports.getBookedNightsByListing = (listingId, startDate, endDate) => {
+  const queryText = `SELECT * FROM booked_nights WHERE listing_id = ${listingId} AND booked_at >= '${startDate}' AND booked_at <= '${endDate}'`;
 
   return client.query(queryText).catch(err => console.log('getBookedNightsByListing', err));
 };
 
-module.exports.getAllInfoAboutListingCategory = (category, parameter) => {
-  const queryText = `SELECT * FROM listings INNER JOIN booked_nights ON listings.listing_id = booked_nights.listing_id WHERE listings.${category} = ${parameter}`;
+module.exports.getAllInfoAboutListingCategory = (category, parameter, startDate, endDate) => {
+  const queryText = `SELECT * FROM listings INNER JOIN booked_nights ON listings.listing_id = booked_nights.listing_id WHERE listings.${category} = ${parameter} AND booked_at >= '${startDate}' AND booked_at <= '${endDate}'`;
 
   return client.query(queryText).catch(err => console.log('getAllInfoAboutListingCategory', err));
 };

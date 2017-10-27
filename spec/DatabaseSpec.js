@@ -34,23 +34,23 @@ describe('Database Spec', () => {
         });
     });
     it('Should get number of booked nights by price', (done) => {
-      getNumberOfBookedNightsByPrice(150, 200)
+      getNumberOfBookedNightsByPrice(150, 200, '2017-09-01', '2018-01-01')
         .then((listings) => {
-          expect(listings.rows[0].count).to.equal('8428250');
+          expect(parseInt(listings.rows[0].count, 10)).to.be.above(1000000);
           done();
         });
     }).timeout(100000);
     it('Should get booked nights by listing', (done) => {
-      getBookedNightsByListing(1053031)
+      getBookedNightsByListing(1053031, '2017-09-01', '2018-01-01')
         .then((listings) => {
           expect(listings.rows[0].listing_id).to.equal(1053031);
           done();
         });
     }).timeout(40000);
     it('Should get all info about listing category', (done) => {
-      getAllInfoAboutListingCategory('review_scores_rating', 99)
+      getAllInfoAboutListingCategory('review_scores_rating', 75, '2017-09-01', '2018-01-01')
         .then((listings) => {
-          expect(listings.rows[0].review_scores_rating).to.equal(99);
+          expect(listings.rows[0].review_scores_rating).to.equal(75);
           done();
         });
     }).timeout(40000);
