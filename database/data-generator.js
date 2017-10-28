@@ -71,7 +71,6 @@ const generateBookingDetails = async (start = 1000000, finish = 2000000) => {
   }
 };
 
-
 const generateBulkBookingDetails = async (start = 1900000, finish = 2000000) => {
   let bulkBooking = [];
   let bulkNightly = [];
@@ -92,7 +91,6 @@ const generateBulkBookingDetails = async (start = 1900000, finish = 2000000) => 
     }
   }
 };
-
 
 const generateElasticBookingDetails = async (start = 1000000, finish = 2000000) => {
   let bulk = [];

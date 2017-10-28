@@ -9,6 +9,10 @@ CREATE TABLE listings (
   review_scores_rating INT
 );
 
+CREATE INDEX market_idx ON listings (market);
+CREATE INDEX room_type_idx ON listings (room_type);
+CREATE INDEX review_scores_rating_idx ON listings (review_scores_rating);
+
 CREATE TABLE search_queries (
   search_id INT NOT NULL PRIMARY KEY,
   market VARCHAR(50),
@@ -34,6 +38,8 @@ CREATE TABLE booked_nights (
 );
 
 CREATE INDEX booked_at_idx ON booked_nights (booked_at);
+CREATE INDEX price_idx ON booked_nights (price);
+CREATE INDEX listing_id_idx ON booked_nights (listing_id);
 
 CREATE TABLE rules (
   id SERIAL UNIQUE NOT NULL PRIMARY KEY,
