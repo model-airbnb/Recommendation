@@ -14,7 +14,6 @@ CREATE TABLE search_queries (
   market VARCHAR(50),
   searched_at DATE NOT NULL,
   room_type VARCHAR(50),
-  max_price MONEY,
   check_in DATE NOT NULL,
   check_out DATE NOT NULL
 );

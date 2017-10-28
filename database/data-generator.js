@@ -1,4 +1,13 @@
-const { addBookingDetail, addSearchQuery, addSearchResult, addElasticBookingDetail, addBookingObj, addBulkElasticBookingDetail, addBookingPrep, addBookingDetailBulk } = require('./helper');
+const {
+  addBookingDetail,
+  addSearchQuery,
+  addSearchResult,
+  addElasticBookingDetail,
+  addBookingObj,
+  addBulkElasticBookingDetail,
+  addBookingPrep,
+  addBookingDetailBulk,
+} = require('./insertionHelpers');
 
 const NEIGHBOURHOODS = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown/Civic Center',
   'Diamond Heights', 'Lakeshore', 'Russian Hill', 'Noe Valley', 'Inner Sunset', 'Outer Richmond',
