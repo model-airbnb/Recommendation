@@ -1,4 +1,13 @@
-const { addBookingDetail, addSearchQuery, addSearchResult, addElasticBookingDetail, addBookingObj, addBulkElasticBookingDetail, addBookingPrep, addBookingDetailBulk } = require('./helper');
+const {
+  addBookingDetail,
+  addSearchQuery,
+  addSearchResult,
+  addElasticBookingDetail,
+  addBookingObj,
+  addBulkElasticBookingDetail,
+  addBookingPrep,
+  addBookingDetailBulk,
+} = require('./insertionHelpers');
 
 const NEIGHBOURHOODS = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown/Civic Center',
   'Diamond Heights', 'Lakeshore', 'Russian Hill', 'Noe Valley', 'Inner Sunset', 'Outer Richmond',
@@ -62,7 +71,6 @@ const generateBookingDetails = async (start = 1000000, finish = 2000000) => {
   }
 };
 
-
 const generateBulkBookingDetails = async (start = 1900000, finish = 2000000) => {
   let bulkBooking = [];
   let bulkNightly = [];
@@ -83,7 +91,6 @@ const generateBulkBookingDetails = async (start = 1900000, finish = 2000000) => 
     }
   }
 };
-
 
 const generateElasticBookingDetails = async (start = 1000000, finish = 2000000) => {
   let bulk = [];

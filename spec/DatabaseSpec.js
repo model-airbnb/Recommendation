@@ -7,11 +7,15 @@ const {
   getListingByAttribute,
   getNumberOfBookedNightsByPrice,
   getBookedNightsByListing,
-  getAllInfoAboutListingCategory,
-} = require('../database/helper');
+  getAveragePriceForSearch,
+} = require('../database/queryHelpers');
+
+const {
+  generateRecommendation,
+} = require('../database/processHelpers');
 
 describe('Database Spec', () => {
-  describe('Listings Table', () => {
+  xdescribe('Listings Table', () => {
     it('Should get listings by type', (done) => {
       getListingAttributeValues('market')
         .then((listings) => {
@@ -47,13 +51,29 @@ describe('Database Spec', () => {
           done();
         });
     }).timeout(40000);
-    it('Should get all info about listing category', (done) => {
-      getAllInfoAboutListingCategory('review_scores_rating', 75, '2017-09-01', '2018-01-01')
+    it('Should get the average price for a search', (done) => {
+      const obj = { market: 'San Francisco', room_type: 'Shared room' };
+      getAveragePriceForSearch(obj, '2017-09-01', '2018-01-01')
         .then((listings) => {
-          expect(listings.rows[0].review_scores_rating).to.equal(75);
+          expect(listings.rows[0].avg).to.be.above(200);
           done();
         });
     }).timeout(40000);
+  });
+  describe('Recommendations Table', () => {
+    it('Should generate a recommendation', (done) => {
+      const obj = {
+        market: 'San Francisco',
+        roomType: 'Shared room',
+        checkIn: '2017-11-11',
+        checkOut: '2018-11-17',
+      };
+      generateRecommendation(obj)
+        .then((price) => {
+          expect(price.rows[0].avg).to.be.above(200);
+          done();
+        });
+    }).timeout(20000);
   });
 });
 
