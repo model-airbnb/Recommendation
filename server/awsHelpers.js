@@ -27,7 +27,7 @@ module.exports.sendBookingDetailMessage = message => (
   })
 );
 
-module.exports.getBookingMessages = () => (
+const getBookingMessages = () => (
   new Promise((resolve, reject) => {
     const params = {
       QueueUrl: QUEUE_URL,
@@ -38,24 +38,28 @@ module.exports.getBookingMessages = () => (
       if (err) {
         reject(err);
       } else {
-        const deleteParams = {
-          QueueUrl: QUEUE_URL,
-          ReceiptHandle: data.Messages[0].ReceiptHandle,
-        };
-        sqs.deleteMessage(deleteParams, (err2, data2) => {
-          if (err2) {
-            reject(err2, data2);
-          } else {
-            const messages = data.Messages.map(message => (JSON.parse(message.Body)));
-            resolve(messages);
-          }
-        });
+        if (data.Messages) {
+          const deleteParams = {
+            QueueUrl: QUEUE_URL,
+            ReceiptHandle: data.Messages[0].ReceiptHandle,
+          };
+          sqs.deleteMessage(deleteParams, (err2, data2) => {
+            if (err2) {
+              reject(err2, data2);
+            } else {
+              const messages = data.Messages.map(message => (JSON.parse(message.Body)));
+              resolve(messages);
+            }
+          });
+        } else {
+          resolve([]);
+        }
       }
     });
   })
 );
 
-module.exports.addBookingMessages = (messages) => {
+const addBookingMessages = (messages) => {
   const bulkBooking = [];
   const bulkNightly = [];
   for (let i = 0; i < messages.length; i += 1) {
@@ -66,16 +70,28 @@ module.exports.addBookingMessages = (messages) => {
   return addBookingDetailBulk(bulkBooking, bulkNightly);
 };
 
-module.exports.addElasticBookingMessages = (messages) => {
+const addElasticBookingMessages = (messages) => {
   let bulk = [];
-  for (let i = 0; i < messages.length; i += 1) {  
+  for (let i = 0; i < messages.length; i += 1) {
     bulk = bulk.concat(addBookingObj(messages[i]));
   }
 };
 
-module.exports.getBookingMessages()
-  .then((messages) => {
-    module.exports.addBookingMessages(messages);
-    module.exports.addElasticBookingMessages(messages);
-  })
-  .catch(err => console.log(err));
+module.exports.fetchMessages = () => {
+  const bookings = [];
+  for (let i = 0; i < 300; i += 1) {
+    bookings.push(getBookingMessages());
+  }
+  return Promise.all(bookings)
+    .then((booked) => {
+      const flatBooked = booked.reduce((a, b) => a.concat(b), []);
+      return flatBooked;
+    })
+    .then((messages) => {
+      addBookingMessages(messages);
+      addElasticBookingMessages(messages);
+    })
+    .catch(err => console.log(err));
+};
+
+setInterval(() => module.exports.fetchMessages(), 10000);

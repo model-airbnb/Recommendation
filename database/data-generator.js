@@ -111,7 +111,7 @@ const generateElasticBookingDetails = async (start = 1000000, finish = 2000000) 
   }
 };
 
-const generateSQSBookingDetails = async (start = 1000000, finish = 1000100) => {
+const generateSQSBookingDetails = async (start = 2002000, finish = 2003000) => {
   let bulk = [];
   for (let listingId = start; listingId < finish; listingId += 1) {
     for (let startingDay = 5; startingDay <= 129; startingDay += 7) {
