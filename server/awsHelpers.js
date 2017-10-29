@@ -34,7 +34,6 @@ const getBookingMessages = () => (
       QueueUrl: QUEUE_URL,
       MaxNumberOfMessages: 10,
     };
-
     sqs.receiveMessage(params, (err, data) => {
       if (err) reject(err);
       else resolve(data.Messages || []);
