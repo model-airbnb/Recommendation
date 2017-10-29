@@ -9,9 +9,7 @@ const {
   addBookingDetailBulk,
 } = require('./insertionHelpers');
 
-const {
-  sendBookingDetailMessage,
-} = require('../server/awsHelpers.js');
+const { sendBookingDetailMessage } = require('../server/awsHelpers.js');
 
 const NEIGHBOURHOODS = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown/Civic Center',
   'Diamond Heights', 'Lakeshore', 'Russian Hill', 'Noe Valley', 'Inner Sunset', 'Outer Richmond',
@@ -70,7 +68,7 @@ const generateBookingDetails = async (start = 1000000, finish = 2000000) => {
     if (listingId % 10000 === 0) {
       await Promise.all(bulk)
         .then(() => { bulk = []; })
-        .catch(err => console.log(err));
+        .catch(console.log);
     }
   }
 };
@@ -91,7 +89,7 @@ const generateBulkBookingDetails = async (start = 1900000, finish = 2000000) => 
           bulkBooking = [];
           bulkNightly = [];
         })
-        .catch(err => console.log(err));
+        .catch(console.log);
     }
   }
 };
@@ -106,7 +104,7 @@ const generateElasticBookingDetails = async (start = 1000000, finish = 2000000) 
     if (listingId % 10000 === 0) {
       await addBulkElasticBookingDetail(bulk)
         .then(() => { bulk = []; })
-        .catch(err => console.log(err));
+        .catch(console.log);
     }
   }
 };
@@ -121,12 +119,12 @@ const generateSQSBookingDetails = async (start = 2002000, finish = 2003000) => {
     if (listingId % 10 === 0) {
       await Promise.all(bulk)
         .then(() => { bulk = []; })
-        .catch(err => console.log(err));
+        .catch(console.log);
     }
   }
 };
 
 generateSQSBookingDetails();
-// generateBookingDetails();
-// generateBulkBookingDetails();
-// generateElasticBookingDetails();
+generateBookingDetails();
+generateBulkBookingDetails();
+generateElasticBookingDetails();
