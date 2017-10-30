@@ -11,7 +11,7 @@ const {
 
 const { sendBookingDetailMessage } = require('../server/awsHelpers.js');
 
-const NEIGHBOURHOODS = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown/Civic Center',
+const neighbourhoods = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown/Civic Center',
   'Diamond Heights', 'Lakeshore', 'Russian Hill', 'Noe Valley', 'Inner Sunset', 'Outer Richmond',
   'Crocker Amazon', 'Excelsior', 'Parkside', 'Financial District', 'Ocean View', 'Mission',
   'West of Twin Peaks', 'Inner Richmond', 'Marina', 'Bayview', 'Pacific Heights',
@@ -19,7 +19,7 @@ const NEIGHBOURHOODS = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown
   'Chinatown', 'North Beach', 'Nob Hill', 'Outer Sunset', 'Western Addition',
   'Golden Gate Park', 'Visitacion Valley'];
 
-const ROOMTYPE = ['Private room', 'Entire home/apt', 'Shared room'];
+const roomType = ['Private room', 'Entire home/apt', 'Shared room'];
 
 const STARTDATE = '2017-10-01T23:59:59Z';
 
@@ -51,8 +51,8 @@ const generateSingleBooking = (listingId, offset = 1) => {
     userId: Math.floor(Math.random() * USER_ID_RANGE),
     searchId: listingId + offset + SEARCH_ID_OFFSET,
     market: 'San Francisco',
-    neighbourhood: NEIGHBOURHOODS[listingId % NEIGHBOURHOODS.length],
-    roomType: ROOMTYPE[listingId % ROOMTYPE.length],
+    neighbourhood: neighbourhoods[listingId % neighbourhoods.length],
+    roomType: roomType[listingId % roomType.length],
     averageRating: listingId % 100,
     nightlyPrices: generateNightlyPrices(randomNumberOfNights, nightlyPrice, offset),
   };
@@ -109,7 +109,7 @@ const generateElasticBookingDetails = async (start = 1000000, finish = 2000000) 
   }
 };
 
-const generateSQSBookingDetails = async (start = 2002000, finish = 2003000) => {
+const generateSQSBookingDetails = async (start = 2005000, finish = 2020000) => {
   let bulk = [];
   for (let listingId = start; listingId < finish; listingId += 1) {
     for (let startingDay = 5; startingDay <= 129; startingDay += 7) {
