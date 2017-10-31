@@ -62,18 +62,230 @@ describe('Database Spec', () => {
   });
   describe('Recommendations Table', () => {
     it('Should generate a recommendation', (done) => {
-      const obj = {
-        market: 'San Francisco',
-        roomType: 'Shared room',
-        checkIn: '2017-11-11',
-        checkOut: '2018-11-17',
-      };
-      generateRecommendation(obj)
-        .then((price) => {
-          expect(price.rows[0].avg).to.be.above(200);
+      const obj = `{
+        "topic": "search-availability",
+        "payload": {
+          "searchEventId": "gt9s1syij9em2uf5",
+          "searchRequest": {
+            "timestamp": "2017-10-30T20:02:49.600Z",
+            "visitId": "258",
+            "userId": "459023",
+            "market": "San Francisco",
+            "checkIn": "2017-11-12",
+            "checkOut": "2017-11-14",
+            "roomType": "any",
+            "limit": "10"
+          },
+          "searchResults": [
+            {
+              "listingId": 5858,
+              "listingName": "Creative Sanctuary",
+              "hostName": "Philip And Tania",
+              "market": "San Francisco",
+              "neighbourhood": "Bernal Heights",
+              "roomType": "Entire home\/apt",
+              "nightlyPrices": [
+                {
+                  "date": "2017-11-12T08:00:00.000Z",
+                  "price": "$235.00"
+                },
+                {
+                  "date": "2017-11-13T08:00:00.000Z",
+                  "price": "$235.00"
+                }
+              ],
+              "averageRating": 56,
+              "score": 0
+            },
+            {
+              "listingId": 7918,
+              "listingName": "A Friendly Room",
+              "hostName": "Aaron",
+              "market": "San Francisco",
+              "neighbourhood": "Haight Ashbury",
+              "roomType": "Private room",
+              "nightlyPrices": [
+                {
+                  "date": "2017-11-12T08:00:00.000Z",
+                  "price": "$63.00"
+                },
+                {
+                  "date": "2017-11-13T08:00:00.000Z",
+                  "price": "$63.00"
+                }
+              ],
+              "averageRating": 24,
+              "score": 1
+            },
+            {
+              "listingId": 8014,
+              "listingName": "Newly Remodeled room in big house WIFI market",
+              "hostName": "Jia",
+              "market": "San Francisco",
+              "neighbourhood": "Outer Mission",
+              "roomType": "Private room",
+              "nightlyPrices": [
+                {
+                  "date": "2017-11-12T08:00:00.000Z",
+                  "price": "$60.00"
+                },
+                {
+                  "date": "2017-11-13T08:00:00.000Z",
+                  "price": "$60.00"
+                }
+              ],
+              "averageRating": 9,
+              "score": 2
+            },
+            {
+              "listingId": 8142,
+              "listingName": "Friendly Room Apartment Style",
+              "hostName": "Aaron",
+              "market": "San Francisco",
+              "neighbourhood": "Haight Ashbury",
+              "roomType": "Private room",
+              "nightlyPrices": [
+                {
+                  "date": "2017-11-12T08:00:00.000Z",
+                  "price": "$63.00"
+                },
+                {
+                  "date": "2017-11-13T08:00:00.000Z",
+                  "price": "$63.00"
+                }
+              ],
+              "averageRating": 54,
+              "score": 3
+            },
+            {
+              "listingId": 8339,
+              "listingName": "Historic Alamo Square Victorian",
+              "hostName": "Rosy",
+              "market": "San Francisco",
+              "neighbourhood": "Western Addition",
+              "roomType": "Entire home\/apt",
+              "nightlyPrices": [
+                {
+                  "date": "2017-11-12T08:00:00.000Z",
+                  "price": "$775.00"
+                },
+                {
+                  "date": "2017-11-13T08:00:00.000Z",
+                  "price": "$775.00"
+                }
+              ],
+              "averageRating": 33,
+              "score": 4
+            },
+            {
+              "listingId": 8739,
+              "listingName": "Mission Sunshine, with Private Bath",
+              "hostName": "Ivan & Wendy",
+              "market": "San Francisco",
+              "neighbourhood": "Mission",
+              "roomType": "Private room",
+              "nightlyPrices": [
+                {
+                  "date": "2017-11-12T08:00:00.000Z",
+                  "price": "$137.00"
+                },
+                {
+                  "date": "2017-11-13T08:00:00.000Z",
+                  "price": "$139.00"
+                }
+              ],
+              "averageRating": 25,
+              "score": 5
+            },
+            {
+              "listingId": 9225,
+              "listingName": "Artful Potrero Separate Floor with Garden",
+              "hostName": "Gae",
+              "market": "San Francisco",
+              "neighbourhood": "Potrero Hill",
+              "roomType": "Private room",
+              "nightlyPrices": [
+                {
+                  "date": "2017-11-12T08:00:00.000Z",
+                  "price": "$135.00"
+                },
+                {
+                  "date": "2017-11-13T08:00:00.000Z",
+                  "price": "$135.00"
+                }
+              ],
+              "averageRating": 86,
+              "score": 6
+            },
+            {
+              "listingId": 10251,
+              "listingName": " Victorian Suite in Inner Mission",
+              "hostName": "Roman & Sarah",
+              "market": "San Francisco",
+              "neighbourhood": "Mission",
+              "roomType": "Entire home\/apt",
+              "nightlyPrices": [
+                {
+                  "date": "2017-11-12T08:00:00.000Z",
+                  "price": "$300.00"
+                },
+                {
+                  "date": "2017-11-13T08:00:00.000Z",
+                  "price": "$300.00"
+                }
+              ],
+              "averageRating": 0,
+              "score": 7
+            },
+            {
+              "listingId": 10832,
+              "listingName": "Union Square Modern Loft",
+              "hostName": "Bernat",
+              "market": "San Francisco",
+              "neighbourhood": "Downtown\/Civic Center",
+              "roomType": "Entire home\/apt",
+              "nightlyPrices": [
+                {
+                  "date": "2017-11-12T08:00:00.000Z",
+                  "price": "$156.00"
+                },
+                {
+                  "date": "2017-11-13T08:00:00.000Z",
+                  "price": "$156.00"
+                }
+              ],
+              "averageRating": 23,
+              "score": 8
+            },
+            {
+              "listingId": 11009,
+              "listingName": "XL Marina Flat\/Trendy (Flat Street)",
+              "hostName": "Kathleen",
+              "market": "San Francisco",
+              "neighbourhood": "Marina",
+              "roomType": "Entire home\/apt",
+              "nightlyPrices": [
+                {
+                  "date": "2017-11-12T08:00:00.000Z",
+                  "price": "$475.00"
+                },
+                {
+                  "date": "2017-11-13T08:00:00.000Z",
+                  "price": "$475.00"
+                }
+              ],
+              "averageRating": 94,
+              "score": 9
+            }
+          ]
+        }
+      }`;
+      generateRecommendation(JSON.parse(obj))
+        .then((rec) => {
+          expect(rec.coefficients.priceCoefficient).to.equal(0);
           done();
         });
-    }).timeout(20000);
+    }).timeout(30000);
   });
 });
 

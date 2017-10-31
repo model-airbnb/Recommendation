@@ -48,12 +48,12 @@ module.exports.getAveragePriceForSearch = (parameters, startDate, endDate) => {
   ));
 
   const queryString = queryArray.join(' AND ');
+  const bookedString = ` AND booked_at >= '${startDate}' AND booked_at <= '${endDate}' `;
 
   const queryText = `SELECT AVG(booked_nights.price::money::numeric::float8) FROM listings
     INNER JOIN booked_nights ON listings.listing_id = booked_nights.listing_id
-    WHERE ${queryString} 
-      AND booked_at >= '${startDate}'
-      AND booked_at <= '${endDate}'`;
-  return client.query(queryText).catch(err => console.log('getAllInfoAboutListingCategory', err));
+    WHERE ${queryString} ${startDate ? bookedString : ''}`;
+  console.log('queryText', queryText); 
+  return client.query(queryText).catch(err => console.log('getAveragePriceForSearch', err));
 };
 
