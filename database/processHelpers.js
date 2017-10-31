@@ -12,6 +12,7 @@ const {
 
 const convertAveragePriceToScore = (averagePrice, scoringObj) => (
   new Promise((resolve, reject) => {
+    if (!averagePrice) resolve(0);
     redisClient.hget('scoring', JSON.stringify(scoringObj), (err, reply) => {
       if (err) reject(err);
       redisClient.hset('scoring', JSON.stringify(scoringObj), averagePrice, () => {

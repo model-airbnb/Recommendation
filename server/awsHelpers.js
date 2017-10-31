@@ -66,7 +66,7 @@ const addSearchMessages = (messages) => {
 
 module.exports.fetchSearchMessages = () => {
   const searches = [];
-  for (let i = 0; i < 1; i += 1) {
+  for (let i = 0; i < 300; i += 1) {
     searches.push(getSearchMessages());
   }
   return Promise.all(searches)
@@ -154,5 +154,3 @@ module.exports.fetchMessages = () => {
     })
     .catch(console.log);
 };
-
-module.exports.fetchSearchMessages();
