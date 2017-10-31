@@ -3,6 +3,23 @@ const { elasticClient } = require('./elasticsearch.js');
 
 // INSERTION OPERATIONS
 
+
+const addRecommendation = (message) => {
+  const { coefficients } = message;
+  const {
+    roomType, market, checkIn, checkOut,
+  } = message.rules;
+  const checkInString = checkIn ? `'${checkIn}', '${checkOut}'` : 'NULL, NULL';
+  const recText = `INSERT INTO scoring_recommendations (created_at, room_type, market, check_in, check_out, coefficients) 
+    VALUES ('${(new Date()).toISOString()}', '${roomType}', '${market}', ${checkInString}, '${JSON.stringify(coefficients)}')`;
+  return client.query(recText).catch(console.log);
+};
+
+module.exports.addRecommendations = (messages) => {
+  const recs = messages.map(message => addRecommendation(message));
+  return Promise.all(recs).catch(console.log);
+};
+
 module.exports.addBookingDetail = (obj) => {
   const {
     listingId, searchId, neighbourhood, roomType, nightlyPrices, market, averageRating,
@@ -97,7 +114,7 @@ module.exports.addElasticBookingDetail = (obj) => {
       },
     };
 
-    return elasticClient.create(bookingObj).catch(err => console.log(err));
+    return elasticClient.create(bookingObj).catch(console.log);
   });
 
   return Promise.all(nightlyEntries);
@@ -139,5 +156,5 @@ module.exports.addBulkElasticBookingDetail = (array) => {
   const bulkObj = {
     body: array,
   };
-  return elasticClient.bulk(bulkObj).catch(err => console.log(err));
+  return elasticClient.bulk(bulkObj).catch(console.log);
 };

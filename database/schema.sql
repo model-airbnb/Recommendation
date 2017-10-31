@@ -41,17 +41,12 @@ CREATE INDEX booked_at_idx ON booked_nights (booked_at);
 CREATE INDEX price_idx ON booked_nights (price);
 CREATE INDEX listing_id_idx ON booked_nights (listing_id);
 
-CREATE TABLE rules (
+CREATE TABLE scoring_recommendations (
   id SERIAL UNIQUE NOT NULL PRIMARY KEY,
+  created_at TIMESTAMP NOT NULL,
   room_type VARCHAR(50),
   market VARCHAR(50),
-  neighbourhood VARCHAR(50)
-);
-CREATE TABLE coefficients (
-  id SERIAL UNIQUE NOT NULL PRIMARY KEY,
-  price_coefficient FLOAT
-);
-CREATE TABLE scoring_recommendations (
-  rules_id INT NOT NULL REFERENCES rules(id),
-  coefficient_id INT NOT NULL REFERENCES coefficients(id)
+  check_in DATE,
+  check_out DATE,
+  coefficients JSON
 );

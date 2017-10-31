@@ -4,6 +4,7 @@ const {
   addBookingDetailBulk,
   addBookingObj,
   addBulkElasticBookingDetail,
+  addRecommendations,
 } = require('../database/insertionHelpers');
 const {
   generateRecommendation,
@@ -25,16 +26,16 @@ const sendRecommendationMessage = message => (
       QueueUrl: RECOMMENDATION_URL,
     };
 
-    sqs.sendMessage(params, (err, data) => {
+    sqs.sendMessage(params, (err) => {
       if (err) reject(err);
-      else resolve(data.MessageId);
+      else resolve(message);
     });
   })
 );
 
 const sendRecommendationMessages = (messages) => {
+  console.log('sending messages', messages);
   const messageArray = messages.map(message => sendRecommendationMessage(message));
-
   return Promise.all(messageArray);
 };
 
@@ -45,7 +46,6 @@ const getSearchMessages = () => (
       MaxNumberOfMessages: 10,
     };
     sqs.receiveMessage(params, (err, data) => {
-      console.log(data);
       if (err) reject(err);
       if (!data.Messages) resolve([]);
       else {
@@ -60,13 +60,15 @@ const addSearchMessages = (messages) => {
   for (let i = 0; i < messages.length; i += 1) {
     generateRecommendation(messages[i]);
   }
+  console.log('search messages');
   const messagesArray = messages.map(message => generateRecommendation(message));
-  return Promise.all(messagesArray);
+  return Promise.all(messagesArray)
+    .then(allMessages => allMessages.filter(message => message.coefficients.priceCoefficient !== null));
 };
 
 module.exports.fetchSearchMessages = () => {
   const searches = [];
-  for (let i = 0; i < 300; i += 1) {
+  for (let i = 0; i < 1; i += 1) {
     searches.push(getSearchMessages());
   }
   return Promise.all(searches)
@@ -75,6 +77,7 @@ module.exports.fetchSearchMessages = () => {
     ))
     .then(addSearchMessages)
     .then(sendRecommendationMessages)
+    .then(addRecommendations)
     .catch(console.log);
 };
 
@@ -154,3 +157,5 @@ module.exports.fetchMessages = () => {
     })
     .catch(console.log);
 };
+
+module.exports.fetchSearchMessages();
