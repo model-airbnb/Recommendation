@@ -4,14 +4,15 @@ const {
   addBookingDetailBulk,
   addBookingObj,
   addBulkElasticBookingDetail,
+  addRecommendations,
 } = require('../database/insertionHelpers');
 const {
   generateRecommendation,
 } = require('../database/processHelpers');
 
-const BOOKING_URL = ' https://sqs.us-west-1.amazonaws.com/455252795481/booking-details';
-const RECOMMENDATION_URL = 'https://sqs.us-west-1.amazonaws.com/455252795481/ModelAirbnb-Recommendation';
-const SEARCH_URL = 'https://sqs.us-west-1.amazonaws.com/766255721592/ModelAirbnb-Search';
+const BOOKING_URL = 'https://sqs.us-west-1.amazonaws.com/455252795481/ModelAirbnb-Inventory';
+const RECOMMENDATION_URL = 'https://sqs.us-west-1.amazonaws.com/766255721592/ModelAirbnb-Recommendations';
+const SEARCH_URL = 'https://sqs.us-west-1.amazonaws.com/455252795481/ModelAirbnb-Search';
 
 // INSERTION OPERATIONS: SEARCH (SQS)
 
@@ -25,16 +26,15 @@ const sendRecommendationMessage = message => (
       QueueUrl: RECOMMENDATION_URL,
     };
 
-    sqs.sendMessage(params, (err, data) => {
+    sqs.sendMessage(params, (err) => {
       if (err) reject(err);
-      else resolve(data.MessageId);
+      else resolve(message);
     });
   })
 );
 
 const sendRecommendationMessages = (messages) => {
   const messageArray = messages.map(message => sendRecommendationMessage(message));
-
   return Promise.all(messageArray);
 };
 
@@ -45,7 +45,6 @@ const getSearchMessages = () => (
       MaxNumberOfMessages: 10,
     };
     sqs.receiveMessage(params, (err, data) => {
-      console.log(data);
       if (err) reject(err);
       if (!data.Messages) resolve([]);
       else {
@@ -57,16 +56,14 @@ const getSearchMessages = () => (
 );
 
 const addSearchMessages = (messages) => {
-  for (let i = 0; i < messages.length; i += 1) {
-    generateRecommendation(messages[i]);
-  }
   const messagesArray = messages.map(message => generateRecommendation(message));
-  return Promise.all(messagesArray);
+  return Promise.all(messagesArray)
+    .then(allMessages => allMessages.filter(message => message.coefficients.priceCoefficient !== null));
 };
 
 module.exports.fetchSearchMessages = () => {
   const searches = [];
-  for (let i = 0; i < 300; i += 1) {
+  for (let i = 0; i < 10; i += 1) {
     searches.push(getSearchMessages());
   }
   return Promise.all(searches)
@@ -75,6 +72,7 @@ module.exports.fetchSearchMessages = () => {
     ))
     .then(addSearchMessages)
     .then(sendRecommendationMessages)
+    .then(addRecommendations)
     .catch(console.log);
 };
 
@@ -154,3 +152,5 @@ module.exports.fetchMessages = () => {
     })
     .catch(console.log);
 };
+
+module.exports.fetchSearchMessages();

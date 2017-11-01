@@ -1,4 +1,34 @@
 const { client } = require('./client');
+const { elasticClient } = require('./elasticsearch.js');
+
+// ELASTIC QUERIES
+
+module.exports.getAveragePriceElastic = (parameters, startDate, endDate) => {
+  const queryArray = Object.keys(parameters).map((key) => {
+    const obj = {
+      [`doc.${key}`]: parameters[key],
+    };
+    return { match: obj };
+  }).concat({ range: { 'doc.booked_at': { gte: startDate, lte: endDate } } });
+
+  return elasticClient.search({
+    index: 'bookings',
+    type: 'booking',
+    size: 10000,
+    body: {
+      query: {
+        bool: {
+          must: queryArray,
+        },
+      },
+      // sort: { 'doc.created_at': 'desc' },
+    },
+  }).then(results => (
+    (results.hits.hits.reduce((sum, result) => (
+      sum + result._source.doc.price
+    ), 0)) / (results.hits.hits.length)
+  )).catch((err) => { console.trace(err.message); });
+};
 
 // QUERIES
 
@@ -53,7 +83,6 @@ module.exports.getAveragePriceForSearch = (parameters, startDate, endDate) => {
   const queryText = `SELECT AVG(booked_nights.price::money::numeric::float8) FROM listings
     INNER JOIN booked_nights ON listings.listing_id = booked_nights.listing_id
     WHERE ${queryString} ${startDate ? bookedString : ''}`;
-  console.log('queryText', queryText); 
   return client.query(queryText).catch(err => console.log('getAveragePriceForSearch', err));
 };
 
