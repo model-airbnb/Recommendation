@@ -14,6 +14,39 @@ const BOOKING_URL = 'https://sqs.us-west-1.amazonaws.com/455252795481/ModelAirbn
 const RECOMMENDATION_URL = 'https://sqs.us-west-1.amazonaws.com/766255721592/ModelAirbnb-Recommendations';
 const SEARCH_URL = 'https://sqs.us-west-1.amazonaws.com/455252795481/ModelAirbnb-Search';
 
+// RETRIEVAL OPERATIONS (AWS)
+
+const getMessages = URL => (
+  new Promise((resolve, reject) => {
+    const params = {
+      QueueUrl: URL,
+      MaxNumberOfMessages: 10,
+    };
+    sqs.receiveMessage(params, (err, data) => {
+      if (err) reject(err);
+      else resolve(data.Messages || []);
+    });
+  })
+    .then(messages => new Promise((resolve, reject) => {
+      if (messages.length === 0) resolve(messages);
+      const deleteParams = {
+        QueueUrl: URL,
+        Entries: messages.map(message => (
+          {
+            Id: message.MessageId,
+            ReceiptHandle: message.ReceiptHandle,
+          }
+        )),
+      };
+      sqs.deleteMessageBatch(deleteParams, (err) => {
+        if (err) reject(err);
+        else {
+          const parsedMessages = messages.map(message => (JSON.parse(message.Body)));
+          resolve(parsedMessages);
+        }
+      });
+    }))
+);
 // INSERTION OPERATIONS: SEARCH (SQS)
 
 const sendRecommendationMessage = message => (
@@ -38,42 +71,27 @@ const sendRecommendationMessages = (messages) => {
   return Promise.all(messageArray);
 };
 
-const getSearchMessages = () => (
-  new Promise((resolve, reject) => {
-    const params = {
-      QueueUrl: SEARCH_URL,
-      MaxNumberOfMessages: 10,
-    };
-    sqs.receiveMessage(params, (err, data) => {
-      if (err) reject(err);
-      if (!data.Messages) resolve([]);
-      else {
-        const parsedMessages = data.Messages.map(message => (JSON.parse(message.Body)));
-        resolve(parsedMessages);
-      }
-    });
-  })
-);
-
 const addSearchMessages = (messages) => {
   const messagesArray = messages.map(message => generateRecommendation(message));
   return Promise.all(messagesArray)
     .then(allMessages => allMessages.filter(message => message.coefficients.priceCoefficient !== null));
 };
 
-module.exports.fetchSearchMessages = () => {
-  const searches = [];
-  for (let i = 0; i < 10; i += 1) {
-    searches.push(getSearchMessages());
-  }
-  return Promise.all(searches)
-    .then(booked => (
-      booked.reduce((a, b) => a.concat(b), [])
-    ))
+
+const fetch10Messages = () => (
+  getMessages(SEARCH_URL)
     .then(addSearchMessages)
     .then(sendRecommendationMessages)
-    .then(addRecommendations)
-    .catch(console.log);
+    .catch(console.log)
+);
+
+module.exports.fetchSearchMessages = async () => {
+  const finishedMessages = [];
+  for (let i = 0; i < 5; i += 1) {
+    finishedMessages.push(await fetch10Messages());
+  }
+  console.log('this is what is being added', finishedMessages.reduce((a, b) => a.concat(b), []));
+  addRecommendations(finishedMessages.reduce((a, b) => a.concat(b), []));
 };
 
 // INSERTION OPERATIONS: BOOKING (SQS)
@@ -91,32 +109,6 @@ module.exports.sendBookingDetailMessage = message => (
   })
 );
 
-const getBookingMessages = () => (
-  new Promise((resolve, reject) => {
-    const params = {
-      QueueUrl: BOOKING_URL,
-      MaxNumberOfMessages: 10,
-    };
-    sqs.receiveMessage(params, (err, data) => {
-      if (err) reject(err);
-      else resolve(data.Messages || []);
-    });
-  })
-    .then(messages => new Promise((resolve, reject) => {
-      if (messages.length === 0) resolve(messages);
-      const deleteParams = {
-        QueueUrl: BOOKING_URL,
-        ReceiptHandle: messages[0].ReceiptHandle,
-      };
-      sqs.deleteMessage(deleteParams, (err) => {
-        if (err) reject(err);
-        else {
-          const parsedMessages = messages.map(message => (JSON.parse(message.Body)));
-          resolve(parsedMessages);
-        }
-      });
-    }))
-);
 
 const addBookingMessages = (messages) => {
   const bulkBooking = [];
@@ -140,7 +132,7 @@ const addElasticBookingMessages = (messages) => {
 module.exports.fetchMessages = () => {
   const bookings = [];
   for (let i = 0; i < 300; i += 1) {
-    bookings.push(getBookingMessages());
+    bookings.push(getMessages(BOOKING_URL));
   }
   return Promise.all(bookings)
     .then(booked => (
