@@ -10,9 +10,9 @@ const {
   generateRecommendation,
 } = require('../database/processHelpers');
 
-const BOOKING_URL = ' https://sqs.us-west-1.amazonaws.com/455252795481/booking-details';
-const RECOMMENDATION_URL = 'https://sqs.us-west-1.amazonaws.com/455252795481/ModelAirbnb-Recommendation';
-const SEARCH_URL = 'https://sqs.us-west-1.amazonaws.com/766255721592/ModelAirbnb-Search';
+const BOOKING_URL = 'https://sqs.us-west-1.amazonaws.com/455252795481/ModelAirbnb-Inventory';
+const RECOMMENDATION_URL = 'https://sqs.us-west-1.amazonaws.com/766255721592/ModelAirbnb-Recommendations';
+const SEARCH_URL = 'https://sqs.us-west-1.amazonaws.com/455252795481/ModelAirbnb-Search';
 
 // INSERTION OPERATIONS: SEARCH (SQS)
 
@@ -34,7 +34,6 @@ const sendRecommendationMessage = message => (
 );
 
 const sendRecommendationMessages = (messages) => {
-  console.log('sending messages', messages);
   const messageArray = messages.map(message => sendRecommendationMessage(message));
   return Promise.all(messageArray);
 };
@@ -57,10 +56,6 @@ const getSearchMessages = () => (
 );
 
 const addSearchMessages = (messages) => {
-  for (let i = 0; i < messages.length; i += 1) {
-    generateRecommendation(messages[i]);
-  }
-  console.log('search messages');
   const messagesArray = messages.map(message => generateRecommendation(message));
   return Promise.all(messagesArray)
     .then(allMessages => allMessages.filter(message => message.coefficients.priceCoefficient !== null));
@@ -68,7 +63,7 @@ const addSearchMessages = (messages) => {
 
 module.exports.fetchSearchMessages = () => {
   const searches = [];
-  for (let i = 0; i < 1; i += 1) {
+  for (let i = 0; i < 10; i += 1) {
     searches.push(getSearchMessages());
   }
   return Promise.all(searches)

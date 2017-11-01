@@ -13,7 +13,6 @@ const {
 
 const convertAveragePriceToScore = (averagePrice, scoringObj) => (
   new Promise((resolve, reject) => {
-    console.log('averagePrice', averagePrice);
     if (!averagePrice) resolve(null);
     else {
       redisClient.hget('scoring', JSON.stringify(scoringObj), (err, reply) => {
@@ -28,7 +27,6 @@ const convertAveragePriceToScore = (averagePrice, scoringObj) => (
 );
 
 module.exports.generateRecommendation = (obj) => {
-  console.log('rec obj', obj);
   const {
     market, checkIn, checkOut, roomType,
   } = obj.payload.request;

@@ -144,6 +144,7 @@ module.exports.addBookingObj = (obj) => {
         booked_at: night.date,
         price: parseFloat(night.price),
         search_id: searchId,
+        created_at: new Date().toISOString(),
       },
     };
     bookingArray.push(docObj);

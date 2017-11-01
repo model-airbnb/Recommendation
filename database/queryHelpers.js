@@ -4,12 +4,12 @@ const { elasticClient } = require('./elasticsearch.js');
 // ELASTIC QUERIES
 
 module.exports.getAveragePriceElastic = (parameters, startDate, endDate) => {
-// console.log(parameters, startDate, endDate);
   const queryArray = Object.keys(parameters).map((key) => {
-    const obj = {};
-    obj[`doc.${key}`] = parameters[key];
+    const obj = {
+      [`doc.${key}`]: parameters[key],
+    };
     return { match: obj };
-  });
+  }).concat({ range: { 'doc.booked_at': { gte: startDate, lte: endDate } } });
 
   return elasticClient.search({
     index: 'bookings',
@@ -18,16 +18,10 @@ module.exports.getAveragePriceElastic = (parameters, startDate, endDate) => {
     body: {
       query: {
         bool: {
-          must: queryArray.concat([
-            {
-              range: {
-                'doc.booked_at': { gte: startDate, lte: endDate },
-              },
-            },
-          ]),
+          must: queryArray,
         },
       },
-//      sort: { date: 'desc' },
+      // sort: { 'doc.created_at': 'desc' },
     },
   }).then(results => (
     (results.hits.hits.reduce((sum, result) => (
