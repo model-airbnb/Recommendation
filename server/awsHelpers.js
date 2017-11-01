@@ -62,7 +62,6 @@ const sendRecommendationMessage = message => (
     sqs.sendMessage(params, (err) => {
       if (err) reject(err);
       else resolve(message);
-      console.log('message', message);
     });
   })
 );
