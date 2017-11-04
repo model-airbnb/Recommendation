@@ -13,7 +13,7 @@ app.get('/', (req, res) => {
   res.send('hello');
 });
 
-const PORT = process.env.PORT || 8080;
+const { PORT } = process.env;
 
 fetchSearchMessages();
 setInterval(() => fetchSearchMessages(), 300000);

@@ -76,7 +76,7 @@ const sendRecommendationMessages = messages => (
 const addSearchMessages = (messages) => {
   const messagesArray = messages.map(message => generateRecommendation(message));
   return Promise.all(messagesArray)
-    .then(allMessages => allMessages.filter(message => message.coefficients.priceCoefficient !== null));
+    .then(allMessages => allMessages.filter(message => message.coefficients.price !== null));
 };
 
 
