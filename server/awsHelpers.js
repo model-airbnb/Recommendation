@@ -49,27 +49,29 @@ const getMessages = URL => (
 );
 // INSERTION OPERATIONS: SEARCH (SQS)
 
-const sendRecommendationMessage = message => (
+const sendRecommendationMessage = (message, i) => (
+  {
+    Id: Date.now().toString() + i,
+    MessageBody: JSON.stringify({
+      topic: 'scoring-coefficients',
+      payload: message,
+    }),
+  }
+);
+
+const sendRecommendationMessages = messages => (
   new Promise((resolve, reject) => {
+    const messageArray = messages.map((message, i) => sendRecommendationMessage(message, i));
     const params = {
-      MessageBody: JSON.stringify({
-        topic: 'scoring-coefficients',
-        payload: message,
-      }),
+      Entries: messageArray,
       QueueUrl: RECOMMENDATION_URL,
     };
-
-    sqs.sendMessage(params, (err) => {
+    sqs.sendMessageBatch(params, (err) => {
       if (err) reject(err);
-      else resolve(message);
+      else resolve(messages);
     });
   })
 );
-
-const sendRecommendationMessages = (messages) => {
-  const messageArray = messages.map(message => sendRecommendationMessage(message));
-  return Promise.all(messageArray);
-};
 
 const addSearchMessages = (messages) => {
   const messagesArray = messages.map(message => generateRecommendation(message));
@@ -87,11 +89,10 @@ const fetch10Messages = () => (
 
 module.exports.fetchSearchMessages = async () => {
   const finishedMessages = [];
-  for (let i = 0; i < 5; i += 1) {
+  for (let i = 0; i < 100; i += 1) {
     finishedMessages.push(await fetch10Messages());
   }
-  console.log('this is what is being added', finishedMessages.reduce((a, b) => a.concat(b), []));
-  addRecommendations(finishedMessages.reduce((a, b) => a.concat(b), []));
+  addRecommendations(finishedMessages.reduce((a, b) => a.concat(b), [])).catch(console.log);
 };
 
 // INSERTION OPERATIONS: BOOKING (SQS)
@@ -129,7 +130,7 @@ const addElasticBookingMessages = (messages) => {
   addBulkElasticBookingDetail(bulk);
 };
 
-module.exports.fetchMessages = () => {
+module.exports.fetchBookingMessages = () => {
   const bookings = [];
   for (let i = 0; i < 300; i += 1) {
     bookings.push(getMessages(BOOKING_URL));
@@ -144,5 +145,3 @@ module.exports.fetchMessages = () => {
     })
     .catch(console.log);
 };
-
-module.exports.fetchSearchMessages();

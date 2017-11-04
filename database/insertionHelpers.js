@@ -113,7 +113,6 @@ module.exports.addElasticBookingDetail = (obj) => {
         search_id: searchId,
       },
     };
-
     return elasticClient.create(bookingObj).catch(console.log);
   });
 
@@ -157,5 +156,6 @@ module.exports.addBulkElasticBookingDetail = (array) => {
   const bulkObj = {
     body: array,
   };
+  console.log(bulkObj);
   return elasticClient.bulk(bulkObj).catch(console.log);
 };
