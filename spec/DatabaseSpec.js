@@ -282,7 +282,7 @@ describe('Database Spec', () => {
       }`;
       generateRecommendation(JSON.parse(obj))
         .then((rec) => {
-          expect(rec.coefficients.priceCoefficient).to.equal(0);
+          expect(rec.coefficients.price).to.equal(0);
           done();
         });
     }).timeout(30000);

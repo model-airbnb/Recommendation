@@ -1,6 +1,6 @@
 const redis = require('redis');
 
-const redisClient = redis.createClient({ host: '13.56.185.37' });
+const redisClient = redis.createClient({ host: process.env.REDISHOST });
 redisClient.on('error', (err) => {
   console.log('Error ', err);
 });

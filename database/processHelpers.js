@@ -41,7 +41,7 @@ module.exports.generateRecommendation = (obj) => {
         date: (new Date()).toISOString(),
         rules: scoringObj,
         coefficients: {
-          priceCoefficient: score,
+          price: score,
         },
       }
     ));
