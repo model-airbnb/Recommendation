@@ -60,7 +60,7 @@ module.exports.addBookingDetailBulk = (bookingArray, nightlyArray) => {
   const nightlyText = `INSERT INTO booked_nights (listing_id, booked_at, price, search_id) 
     VALUES ${nightlyArray.join(', ')}`;
 
-  return client.query(bookingText).then(client.query(nightlyText)).catch(err => console.log(err));
+  return client.query(bookingText).then(client.query(nightlyText)).catch(console.log);
 };
 
 module.exports.addSearchQuery = (obj) => {
@@ -113,7 +113,6 @@ module.exports.addElasticBookingDetail = (obj) => {
         search_id: searchId,
       },
     };
-
     return elasticClient.create(bookingObj).catch(console.log);
   });
 
