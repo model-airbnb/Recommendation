@@ -1,5 +1,5 @@
-const { client } = require('./client');
-const { elasticClient } = require('./elasticsearch.js');
+const { client } = require('../clients/postgres');
+const { elasticClient } = require('../clients/elasticsearch');
 
 // INSERTION OPERATIONS
 
@@ -27,12 +27,12 @@ module.exports.addBookingDetail = (obj) => {
   const bookingText = `INSERT INTO listings (listing_id, market, neighbourhood, room_type, review_scores_rating) 
     VALUES (${listingId}, '${market}', '${neighbourhood}', '${roomType}', ${averageRating}) 
     ON CONFLICT (listing_id) 
-    DO NOTHING`;
+    DO UPDATE SET review_scores_rating = ${averageRating}`;
   return client.query(bookingText)
     .then(() => {
       const nightlyEntries = nightlyPrices.map((night) => {
         const nightlyText = `INSERT INTO booked_nights (listing_id, booked_at, price, search_id) 
-          VALUES (${listingId}, '${night.date}'::date, ${night.price}, ${searchId})`;
+          VALUES (${listingId}, '${night.date}'::date, ${night.price}, '${searchId})'`;
         return client.query(nightlyText);
       });
       return Promise.all(nightlyEntries);
@@ -42,24 +42,26 @@ module.exports.addBookingDetail = (obj) => {
 module.exports.addBookingPrep = (obj) => {
   const {
     listingId, searchId, neighbourhood, roomType, nightlyPrices, market, averageRating,
-  } = obj;
+  } = obj.payload;
   const bookingText = `(${listingId}, '${market}', '${neighbourhood}', '${roomType}', ${averageRating})`;
 
   const nightlyEntries = nightlyPrices.map(night => (
-    `(${listingId}, '${night.date}'::date, ${night.price}, ${searchId})`
+    `(${listingId}, '${night.date}'::date, ${night.price}, '${searchId}')`
   ));
 
   return [bookingText, nightlyEntries];
 };
 
 module.exports.addBookingDetailBulk = (bookingArray, nightlyArray) => {
+  if (bookingArray.length === 0) return [];
   const bookingText = `INSERT INTO listings (listing_id, market, neighbourhood, room_type, review_scores_rating) 
     VALUES ${bookingArray.join(', ')} 
     ON CONFLICT (listing_id) 
-    DO NOTHING`;
+    DO UPDATE SET review_scores_rating = EXCLUDED.review_scores_rating`;
   const nightlyText = `INSERT INTO booked_nights (listing_id, booked_at, price, search_id) 
     VALUES ${nightlyArray.join(', ')}`;
-
+  console.log(bookingText);
+  console.log(nightlyText);
   return client.query(bookingText).then(client.query(nightlyText)).catch(console.log);
 };
 
@@ -68,7 +70,7 @@ module.exports.addSearchQuery = (obj) => {
     searchQueryId, timestamp, market, checkIn, checkOut, roomType,
   } = obj;
   const queryText = `INSERT INTO search_queries (search_id, market, searched_at, check_in, check_out, room_type) 
-    VALUES (${searchQueryId}, '${market}', '${timestamp}', '${checkIn}', '${checkOut}',  '${roomType}') 
+    VALUES ('${searchQueryId}', '${market}', '${timestamp}', '${checkIn}', '${checkOut}',  '${roomType}') 
     ON CONFLICT (search_id)
     DO NOTHING`;
 
@@ -81,7 +83,7 @@ module.exports.addSearchResult = (obj) => {
   } = obj;
   const results = availableListings.map((result) => {
     const resultText = `INSERT INTO listings (search_id, listing_id, scoring_rules)
-      VALUES (${searchQueryId}, '${result.listingId}', '${scoringRules}'::json)
+      VALUES ('${searchQueryId}', '${result.listingId}', '${scoringRules}'::json)
       ON CONFLICT 
       DO NOTHING`;
 
@@ -96,7 +98,7 @@ module.exports.addSearchResult = (obj) => {
 module.exports.addElasticBookingDetail = (obj) => {
   const {
     listingId, searchId, neighbourhood, roomType, nightlyPrices, market, averageRating,
-  } = obj;
+  } = obj.payload;
   const nightlyEntries = nightlyPrices.map((night) => {
     const bookingObj = {
       index: 'bookings',
@@ -122,7 +124,7 @@ module.exports.addElasticBookingDetail = (obj) => {
 module.exports.addBookingObj = (obj) => {
   const {
     listingId, searchId, neighbourhood, roomType, nightlyPrices, market, averageRating,
-  } = obj;
+  } = obj.payload;
   const bookingArray = [];
   nightlyPrices.forEach((night) => {
     const indexObj = {

@@ -1,13 +1,7 @@
-const { client } = require('./client');
-const { redisClient } = require('./redis');
-const {
-  addSearchQuery,
-  addSearchResult,
-} = require('./insertionHelpers');
-const {
-  getAveragePriceForSearch,
-  getAveragePriceElastic,
-} = require('./queryHelpers');
+const { addSearchQuery, addSearchResult } = require('./insertionHelpers');
+const { getAveragePriceForSearch, getAveragePriceElastic } = require('./queryHelpers');
+const { client } = require('../clients/postgres');
+const { redisClient } = require('../clients/redis');
 
 // PROCESS OPERATORS
 

@@ -14,7 +14,7 @@ CREATE INDEX room_type_idx ON listings (room_type);
 CREATE INDEX review_scores_rating_idx ON listings (review_scores_rating);
 
 CREATE TABLE search_queries (
-  search_id INT NOT NULL PRIMARY KEY,
+  search_id VARCHAR(50) NOT NULL PRIMARY KEY,
   market VARCHAR(50),
   searched_at DATE NOT NULL,
   room_type VARCHAR(50),
@@ -25,7 +25,7 @@ CREATE TABLE search_queries (
 CREATE INDEX searched_at_idx ON search_queries (searched_at);
 
 CREATE TABLE search_results (
-  search_id INT NOT NULL REFERENCES search_queries(search_id),
+  search_id VARCHAR(50) NOT NULL REFERENCES search_queries(search_id),
   listing_id INT NOT NULL REFERENCES listings(listing_id),
   scoring_rules JSON
 );
@@ -34,7 +34,7 @@ CREATE TABLE booked_nights (
   listing_id INT NOT NULL REFERENCES listings(listing_id),
   booked_at DATE NOT NULL,
   price MONEY,
-  search_id INT NOT NULL
+  search_id VARCHAR(50) NOT NULL
 );
 
 CREATE INDEX booked_at_idx ON booked_nights (booked_at);

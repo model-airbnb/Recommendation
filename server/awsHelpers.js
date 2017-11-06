@@ -5,10 +5,8 @@ const {
   addBookingObj,
   addBulkElasticBookingDetail,
   addRecommendations,
-} = require('../database/insertionHelpers');
-const {
-  generateRecommendation,
-} = require('../database/processHelpers');
+} = require('../database/helpers/insertionHelpers');
+const { generateRecommendation } = require('../database/helpers/processHelpers');
 
 const BOOKING_URL = 'https://sqs.us-west-1.amazonaws.com/455252795481/ModelAirbnb-Inventory';
 const RECOMMENDATION_URL = 'https://sqs.us-west-1.amazonaws.com/766255721592/ModelAirbnb-Recommendations';
@@ -70,6 +68,7 @@ const sendRecommendationMessages = messages => (
       if (err) reject(err);
       else resolve(messages);
     });
+    console.log('Sending Recommendation Messages');
   })
 );
 
@@ -132,7 +131,7 @@ const addElasticBookingMessages = (messages) => {
 
 module.exports.fetchBookingMessages = () => {
   const bookings = [];
-  for (let i = 0; i < 300; i += 1) {
+  for (let i = 0; i < 100; i += 1) {
     bookings.push(getMessages(BOOKING_URL));
   }
   return Promise.all(bookings)
@@ -140,8 +139,10 @@ module.exports.fetchBookingMessages = () => {
       booked.reduce((a, b) => a.concat(b), [])
     ))
     .then((messages) => {
-      addBookingMessages(messages);
+      if (messages.length === 0) return [];
       addElasticBookingMessages(messages);
+      addBookingMessages(messages);
+      return messages;
     })
     .catch(console.log);
 };
