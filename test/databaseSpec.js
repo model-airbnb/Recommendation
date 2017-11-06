@@ -1,6 +1,5 @@
 /* eslint-env mocha */
 const { expect } = require('chai');
-
 const {
   getListingAttributeValues,
   getBookedNightsByDay,
@@ -8,11 +7,10 @@ const {
   getNumberOfBookedNightsByPrice,
   getBookedNightsByListing,
   getAveragePriceForSearch,
-} = require('../database/queryHelpers');
-
+} = require('../database/helpers/queryHelpers');
 const {
   generateRecommendation,
-} = require('../database/processHelpers');
+} = require('../database/helpers/processHelpers');
 
 describe('Database Spec', () => {
   xdescribe('Listings Table', () => {
@@ -83,7 +81,7 @@ describe('Database Spec', () => {
               "hostName": "Philip And Tania",
               "market": "San Francisco",
               "neighbourhood": "Bernal Heights",
-              "roomType": "Entire home\/apt",
+              "roomType": "Entire home apt",
               "nightlyPrices": [
                 {
                   "date": "2017-11-12T08:00:00.000Z",
@@ -163,7 +161,7 @@ describe('Database Spec', () => {
               "hostName": "Rosy",
               "market": "San Francisco",
               "neighbourhood": "Western Addition",
-              "roomType": "Entire home\/apt",
+              "roomType": "Entire home apt",
               "nightlyPrices": [
                 {
                   "date": "2017-11-12T08:00:00.000Z",
@@ -223,7 +221,7 @@ describe('Database Spec', () => {
               "hostName": "Roman & Sarah",
               "market": "San Francisco",
               "neighbourhood": "Mission",
-              "roomType": "Entire home\/apt",
+              "roomType": "Entire home apt",
               "nightlyPrices": [
                 {
                   "date": "2017-11-12T08:00:00.000Z",
@@ -242,8 +240,8 @@ describe('Database Spec', () => {
               "listingName": "Union Square Modern Loft",
               "hostName": "Bernat",
               "market": "San Francisco",
-              "neighbourhood": "Downtown\/Civic Center",
-              "roomType": "Entire home\/apt",
+              "neighbourhood": "Downtown Civic Center",
+              "roomType": "Entire home apt",
               "nightlyPrices": [
                 {
                   "date": "2017-11-12T08:00:00.000Z",
@@ -259,11 +257,11 @@ describe('Database Spec', () => {
             },
             {
               "listingId": 11009,
-              "listingName": "XL Marina Flat\/Trendy (Flat Street)",
+              "listingName": "XL Marina Flat Trendy (Flat Street)",
               "hostName": "Kathleen",
               "market": "San Francisco",
               "neighbourhood": "Marina",
-              "roomType": "Entire home\/apt",
+              "roomType": "Entire home apt",
               "nightlyPrices": [
                 {
                   "date": "2017-11-12T08:00:00.000Z",

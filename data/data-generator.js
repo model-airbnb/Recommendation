@@ -1,3 +1,4 @@
+const { sendBookingDetailMessage } = require('../server/awsHelpers.js');
 const {
   addBookingDetail,
   addSearchQuery,
@@ -7,9 +8,7 @@ const {
   addBulkElasticBookingDetail,
   addBookingPrep,
   addBookingDetailBulk,
-} = require('./insertionHelpers');
-
-const { sendBookingDetailMessage } = require('../server/awsHelpers.js');
+} = require('../database/helpers/insertionHelpers');
 
 const neighbourhoods = ['Seacliff', 'Haight Ashbury', 'Outer Mission', 'Downtown/Civic Center',
   'Diamond Heights', 'Lakeshore', 'Russian Hill', 'Noe Valley', 'Inner Sunset', 'Outer Richmond',
@@ -127,4 +126,4 @@ const generateSQSBookingDetails = async (start = 2005000, finish = 2020000) => {
 // generateSQSBookingDetails();
 // generateBookingDetails();
 // generateBulkBookingDetails();
-generateElasticBookingDetails();
+//generateElasticBookingDetails();

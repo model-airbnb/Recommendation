@@ -1,5 +1,5 @@
-const { client } = require('./client');
-const { elasticClient } = require('./elasticsearch.js');
+const { client } = require('../clients/postgres');
+const { elasticClient } = require('../clients/elasticsearch');
 
 // ELASTIC QUERIES
 
@@ -14,14 +14,14 @@ module.exports.getAveragePriceElastic = (parameters, startDate, endDate) => {
   return elasticClient.search({
     index: 'bookings',
     type: 'booking',
-    size: 10000,
+    size: 1000,
     body: {
       query: {
         bool: {
           must: queryArray,
         },
       },
-      // sort: { 'doc.created_at': 'desc' },
+      sort: { 'doc.created_at': 'desc' },
     },
   }).then(results => (
     (results.hits.hits.reduce((sum, result) => (
