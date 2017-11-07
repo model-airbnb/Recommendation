@@ -57,11 +57,10 @@ module.exports.addBookingDetailBulk = (bookingArray, nightlyArray) => {
   const bookingText = `INSERT INTO listings (listing_id, market, neighbourhood, room_type, review_scores_rating) 
     VALUES ${bookingArray.join(', ')} 
     ON CONFLICT (listing_id) 
-    DO UPDATE SET review_scores_rating = EXCLUDED.review_scores_rating`;
+    DO NOTHING`;
   const nightlyText = `INSERT INTO booked_nights (listing_id, booked_at, price, search_id) 
     VALUES ${nightlyArray.join(', ')}`;
-  console.log(bookingText);
-  console.log(nightlyText);
+
   return client.query(bookingText).then(client.query(nightlyText)).catch(console.log);
 };
 

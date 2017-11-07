@@ -8,9 +8,7 @@ const {
 } = require('../database/helpers/insertionHelpers');
 const { generateRecommendation } = require('../database/helpers/processHelpers');
 
-const BOOKING_URL = 'https://sqs.us-west-1.amazonaws.com/455252795481/ModelAirbnb-Inventory';
-const RECOMMENDATION_URL = 'https://sqs.us-west-1.amazonaws.com/766255721592/ModelAirbnb-Recommendations';
-const SEARCH_URL = 'https://sqs.us-west-1.amazonaws.com/455252795481/ModelAirbnb-Search';
+const { BOOKING_URL, RECOMMENDATION_URL, SEARCH_URL } = process.env;
 
 // RETRIEVAL OPERATIONS (AWS)
 
