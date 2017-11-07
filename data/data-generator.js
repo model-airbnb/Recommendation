@@ -46,14 +46,16 @@ const generateSingleBooking = (listingId, offset = 1) => {
   const nightlyPrice = (listingId % MAX_NIGHTLY_PRICE) + 50;
   const randomNumberOfNights = Math.ceil(Math.random() * NIGHTS_BOOKED_RANGE);
   return {
-    listingId,
-    userId: Math.floor(Math.random() * USER_ID_RANGE),
-    searchId: listingId + offset + SEARCH_ID_OFFSET,
-    market: 'San Francisco',
-    neighbourhood: neighbourhoods[listingId % neighbourhoods.length],
-    roomType: roomType[listingId % roomType.length],
-    averageRating: listingId % 100,
-    nightlyPrices: generateNightlyPrices(randomNumberOfNights, nightlyPrice, offset),
+    payload: {
+      listingId,
+      userId: Math.floor(Math.random() * USER_ID_RANGE),
+      searchId: listingId + offset + SEARCH_ID_OFFSET,
+      market: 'San Francisco',
+      neighbourhood: neighbourhoods[listingId % neighbourhoods.length],
+      roomType: roomType[listingId % roomType.length],
+      averageRating: listingId % 100,
+      nightlyPrices: generateNightlyPrices(randomNumberOfNights, nightlyPrice, offset),
+    },
   };
 };
 
@@ -115,7 +117,7 @@ const generateSQSBookingDetails = async (start = 2005000, finish = 2020000) => {
       const randomStartingDay = startingDay + Math.floor(Math.random() * NIGHTS_UNBOOKED_RANGE);
       bulk = bulk.concat(sendBookingDetailMessage(generateSingleBooking(listingId, randomStartingDay)));
     }
-    if (listingId % 10000 === 0) {
+    if (listingId % 1000 === 0) {
       await Promise.all(bulk)
         .then(() => { bulk = []; })
         .catch(console.log);
@@ -123,7 +125,7 @@ const generateSQSBookingDetails = async (start = 2005000, finish = 2020000) => {
   }
 };
 
-// generateSQSBookingDetails();
+generateSQSBookingDetails();
 // generateBookingDetails();
 // generateBulkBookingDetails();
 //generateElasticBookingDetails();
