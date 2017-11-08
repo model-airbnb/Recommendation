@@ -2,6 +2,7 @@ const { addSearchQuery, addSearchResult } = require('./insertionHelpers');
 const { getAveragePriceForSearch, getAveragePriceElastic } = require('./queryHelpers');
 const { client } = require('../clients/postgres');
 const { redisClient } = require('../clients/redis');
+const { logger } = require('../analytics/winston');
 
 // PROCESS OPERATORS
 

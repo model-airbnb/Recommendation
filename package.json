@@ -5,6 +5,7 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
+    "test": "sh testing.sh",
     "server-dev": "nodemon --inspect server/index.js"
   },
   "repository": {
@@ -40,6 +41,8 @@
     "elasticsearch": "^13.3.1",
     "express": "^4.15.0",
     "pg": "^7.3.0",
-    "redis": "^2.8.0"
+    "redis": "^2.8.0",
+    "winston": "^3.0.0-rc1",
+    "winston-elasticsearch": "^0.5.3"
   }
 }
