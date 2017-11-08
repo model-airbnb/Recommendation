@@ -6,6 +6,7 @@ const esTransportOpts = {
   level: 'info',
   client: elasticClient,
   ensureMappingTemplate: false,
+  index: 'logging',
 };
 
 module.exports.logger = new winston.createLogger({

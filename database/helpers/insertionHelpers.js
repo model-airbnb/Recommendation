@@ -13,8 +13,17 @@ const addRecommendation = (message) => {
   const checkInString = checkIn ? `'${checkIn}', '${checkOut}'` : 'NULL, NULL';
   const recText = `INSERT INTO scoring_recommendations (created_at, room_type, market, check_in, check_out, coefficients) 
     VALUES ('${(new Date()).toISOString()}', '${roomType}', '${market}', ${checkInString}, '${JSON.stringify(coefficients)}')`;
+  const startTime = new Date();
   return client.query(recText)
-    .then((data) => console.log('addRecommendation', data))
+    .then(() => {
+      logger.log({
+        queryName: 'addRecommendation',
+        database: 'postgres',
+        level: 'info',
+        type: 'log',
+        elapsed: new Date() - startTime,
+      });
+    })
     .catch(console.log);
 };
 
@@ -143,7 +152,18 @@ module.exports.addElasticBookingDetail = (obj) => {
         search_id: searchId,
       },
     };
-    return elasticClient.create(bookingObj).catch(console.log);
+    return elasticClient.create(bookingObj)
+      .then((results) => {
+        logger.log({
+          queryName: 'addElasticBookingDetail',
+          database: 'elastic',
+          level: 'info',
+          type: 'log',
+          time: new Date(),
+          elapsed: results.took,
+        });
+      })
+      .catch(console.log);
   });
 
   return Promise.all(nightlyEntries);
@@ -186,5 +206,16 @@ module.exports.addBulkElasticBookingDetail = (array) => {
   const bulkObj = {
     body: array,
   };
-  return elasticClient.bulk(bulkObj).catch(console.log);
+  return elasticClient.bulk(bulkObj)
+    .then((results) => {
+      logger.log({
+        queryName: 'addBulkElasticBookingDetail',
+        database: 'elastic',
+        level: 'info',
+        type: 'log',
+        time: new Date(),
+        elapsed: results.took,
+      });
+    })
+    .catch(console.log);
 };
