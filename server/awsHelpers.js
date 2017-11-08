@@ -7,13 +7,15 @@ const {
   addRecommendations,
 } = require('../database/helpers/insertionHelpers');
 const { generateRecommendation } = require('../database/helpers/processHelpers');
+const { logger } = require('../database/analytics/winston');
 
 const { BOOKING_URL, RECOMMENDATION_URL, SEARCH_URL } = process.env;
 
 // RETRIEVAL OPERATIONS (AWS)
 
-const getMessages = URL => (
-  new Promise((resolve, reject) => {
+const getMessages = (URL) => {
+  const startTime = new Date();
+  return new Promise((resolve, reject) => {
     const params = {
       QueueUrl: URL,
       MaxNumberOfMessages: 10,
@@ -23,26 +25,37 @@ const getMessages = URL => (
       else resolve(data.Messages || []);
     });
   })
-    .then(messages => new Promise((resolve, reject) => {
-      if (messages.length === 0) resolve(messages);
-      const deleteParams = {
-        QueueUrl: URL,
-        Entries: messages.map(message => (
-          {
-            Id: message.MessageId,
-            ReceiptHandle: message.ReceiptHandle,
-          }
-        )),
-      };
-      sqs.deleteMessageBatch(deleteParams, (err) => {
-        if (err) reject(err);
-        else {
-          const parsedMessages = messages.map(message => (JSON.parse(message.Body)));
-          resolve(parsedMessages);
-        }
+    .then((messages) => {
+      logger.log({
+        queryName: 'getMessages',
+        url: URL,
+        database: 'sqs',
+        level: 'info',
+        type: 'log',
+        elapsed: new Date() - startTime,
+        numMessages: messages.length,
       });
-    }))
-);
+      return new Promise((resolve, reject) => {
+        if (messages.length === 0) resolve(messages);
+        const deleteParams = {
+          QueueUrl: URL,
+          Entries: messages.map(message => (
+            {
+              Id: message.MessageId,
+              ReceiptHandle: message.ReceiptHandle,
+            }
+          )),
+        };
+        sqs.deleteMessageBatch(deleteParams, (err) => {
+          if (err) reject(err);
+          else {
+            const parsedMessages = messages.map(message => (JSON.parse(message.Body)));
+            resolve(parsedMessages);
+          }
+        });
+      });
+    });
+};
 // INSERTION OPERATIONS: SEARCH (SQS)
 
 const sendRecommendationMessage = (message, i) => (
@@ -55,8 +68,10 @@ const sendRecommendationMessage = (message, i) => (
   }
 );
 
-const sendRecommendationMessages = messages => (
-  new Promise((resolve, reject) => {
+const sendRecommendationMessages = (messages) => {
+  const startTime = new Date();
+  console.log('Sending Recommendation Messages');
+  return new Promise((resolve, reject) => {
     const messageArray = messages.map((message, i) => sendRecommendationMessage(message, i));
     const params = {
       Entries: messageArray,
@@ -66,9 +81,19 @@ const sendRecommendationMessages = messages => (
       if (err) reject(err);
       else resolve(messages);
     });
-    console.log('Sending Recommendation Messages');
   })
-);
+    .then((messagesBatch) => {
+      logger.log({
+        queryName: 'sendRecommendationMessages',
+        database: 'sqs',
+        level: 'info',
+        type: 'log',
+        elapsed: new Date() - startTime,
+        numMessages: messagesBatch.length,
+      });
+      return messagesBatch;
+    });
+};
 
 const addSearchMessages = (messages) => {
   const messagesArray = messages.map(message => generateRecommendation(message));

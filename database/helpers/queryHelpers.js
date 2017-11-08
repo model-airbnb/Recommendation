@@ -1,5 +1,6 @@
 const { client } = require('../clients/postgres');
 const { elasticClient } = require('../clients/elasticsearch');
+const { logger } = require('../analytics/winston');
 
 // ELASTIC QUERIES
 
@@ -10,7 +11,6 @@ module.exports.getAveragePriceElastic = (parameters, startDate, endDate) => {
     };
     return { match: obj };
   }).concat({ range: { 'doc.booked_at': { gte: startDate, lte: endDate } } });
-
   return elasticClient.search({
     index: 'bookings',
     type: 'booking',
@@ -23,11 +23,20 @@ module.exports.getAveragePriceElastic = (parameters, startDate, endDate) => {
       },
       sort: { 'doc.created_at': 'desc' },
     },
-  }).then(results => (
-    (results.hits.hits.reduce((sum, result) => (
+  }).then((results) => {
+    logger.log({
+      queryName: 'getAveragePriceElastic',
+      database: 'elastic',
+      level: 'info',
+      type: 'log',
+      time: new Date(),
+      elapsed: results.took,
+      totalHits: results.hits.total,
+    });
+    return (results.hits.hits.reduce((sum, result) => (
       sum + result._source.doc.price
-    ), 0)) / (results.hits.hits.length)
-  )).catch((err) => { console.trace(err.message); });
+    ), 0)) / (results.hits.hits.length);
+  }).catch((err) => { console.trace(err.message); });
 };
 
 // QUERIES

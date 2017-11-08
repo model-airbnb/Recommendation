@@ -4,6 +4,11 @@ config/production.json
 config/staging.json
 config/test.json
 Dockerfile
+.dockerignore
+/.nyc_output
+config.json
+recommendation.pem
+testing.sh
 
 # OS X
 .DS_Store

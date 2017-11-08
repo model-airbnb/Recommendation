@@ -1,5 +1,6 @@
 const { client } = require('../clients/postgres');
 const { elasticClient } = require('../clients/elasticsearch');
+const { logger } = require('../analytics/winston');
 
 // INSERTION OPERATIONS
 
@@ -12,7 +13,18 @@ const addRecommendation = (message) => {
   const checkInString = checkIn ? `'${checkIn}', '${checkOut}'` : 'NULL, NULL';
   const recText = `INSERT INTO scoring_recommendations (created_at, room_type, market, check_in, check_out, coefficients) 
     VALUES ('${(new Date()).toISOString()}', '${roomType}', '${market}', ${checkInString}, '${JSON.stringify(coefficients)}')`;
-  return client.query(recText).catch(console.log);
+  const startTime = new Date();
+  return client.query(recText)
+    .then(() => {
+      logger.log({
+        queryName: 'addRecommendation',
+        database: 'postgres',
+        level: 'info',
+        type: 'log',
+        elapsed: new Date() - startTime,
+      });
+    })
+    .catch(console.log);
 };
 
 module.exports.addRecommendations = (messages) => {
@@ -54,14 +66,40 @@ module.exports.addBookingPrep = (obj) => {
 
 module.exports.addBookingDetailBulk = (bookingArray, nightlyArray) => {
   if (bookingArray.length === 0) return [];
+  const startTime = new Date();
+
   const bookingText = `INSERT INTO listings (listing_id, market, neighbourhood, room_type, review_scores_rating) 
     VALUES ${bookingArray.join(', ')} 
     ON CONFLICT (listing_id) 
     DO NOTHING`;
   const nightlyText = `INSERT INTO booked_nights (listing_id, booked_at, price, search_id) 
     VALUES ${nightlyArray.join(', ')}`;
-
-  return client.query(bookingText).then(client.query(nightlyText)).catch(console.log);
+  let startNightlyTime;
+  return client.query(bookingText)
+    .then((data) => {
+      logger.log({
+        queryName: 'addBookingDetailBulk-Booking',
+        database: 'postgres',
+        level: 'info',
+        type: 'log',
+        rows: data.rows,
+        elapsed: new Date() - startTime,
+      });
+      startNightlyTime = new Date();
+      return client.query(nightlyText);
+    })
+    .then((nightlyData) => {
+      logger.log({
+        queryName: 'addBookingDetailBulk-Nightly',
+        database: 'postgres',
+        level: 'info',
+        type: 'log',
+        rows: nightlyData.rows,
+        elapsed: new Date() - startNightlyTime,
+      });
+      return nightlyData;
+    })
+    .catch(console.log);
 };
 
 module.exports.addSearchQuery = (obj) => {
@@ -114,7 +152,18 @@ module.exports.addElasticBookingDetail = (obj) => {
         search_id: searchId,
       },
     };
-    return elasticClient.create(bookingObj).catch(console.log);
+    return elasticClient.create(bookingObj)
+      .then((results) => {
+        logger.log({
+          queryName: 'addElasticBookingDetail',
+          database: 'elastic',
+          level: 'info',
+          type: 'log',
+          time: new Date(),
+          elapsed: results.took,
+        });
+      })
+      .catch(console.log);
   });
 
   return Promise.all(nightlyEntries);
@@ -157,5 +206,16 @@ module.exports.addBulkElasticBookingDetail = (array) => {
   const bulkObj = {
     body: array,
   };
-  return elasticClient.bulk(bulkObj).catch(console.log);
+  return elasticClient.bulk(bulkObj)
+    .then((results) => {
+      logger.log({
+        queryName: 'addBulkElasticBookingDetail',
+        database: 'elastic',
+        level: 'info',
+        type: 'log',
+        time: new Date(),
+        elapsed: results.took,
+      });
+    })
+    .catch(console.log);
 };
