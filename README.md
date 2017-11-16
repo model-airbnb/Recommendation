@@ -16,8 +16,17 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 1. [Usage](#Usage)
 1. [Requirements](#requirements)
 1. [Development](#development)
-    1. [Installing Dependencies](#installing-dependencies)
-    1. [Tasks](#tasks)
+1. [System Service Architecture](#system-service-architecture)
+1. [Messages Consumed](#messages-consumed)
+    1. [Search Query (from Search Service)](#search-query)
+    1. [Search Results (from Search Service)](#search-results)
+    1. [Booking Details (from Inventory Service)](#booking-details)
+1. [Messages Published](#messages-published)
+    1. [Sort Order Scores](#sort-order-scores)
+    1. [Format](#format)
+1. [Schema Design](#schema-design)
+    1. [Inventory Service Schema](#inventory-service-schema)
+    1. [Recommendation Service Schema](#recommendation-service-schema)
 
 ## Usage
 
