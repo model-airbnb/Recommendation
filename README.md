@@ -36,11 +36,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 
 ## System Service Architecture
 
-![Image of Yaktocat](./docs/images/image2.png)
+<img src="./docs/images/image2.png">
 
 ## Messages Consumed
 
-# Search Query (from Search Service)
+### Search Query (from Search Service)
 Search query lets analytics know which searches were actually performed to get the search results. The weights used will be seen here.
 
 Property | Description | Required
@@ -54,81 +54,38 @@ Room Type | string | no
 Amenities | List of amenity IDs | no
 Neighbourhood ID | TBD range | no
 
-#Search Results (from Search Service)
+## Search Results (from Search Service)
 Search results are consumed to see what results are actually being published after the weights, and whether those do lead to purchases. 
 
 Property | Possible Values | Required
-Search Query ID
-TBD range
-yes
-Available Listings
-Sorted list of listings provided to the client in response to a search query
-yes
-     Listing ID
-Identifier for the listing
-yes
-     Neighbourhood ID
-Identifier for the neighbourhood
-yes
-     Room Type
-string
-yes
-     Amenities
-List of amenity IDs
-yes
-     Nightly Prices
-list
-yes
-          Date
-date
-yes
-          Price
-float
-yes
-     Average Rating
-Float (NULL of number of reviews = 0)
-yes
-    Recommendation Weight
-Object
-yes
+---------|-----------------|----------
+Search Query ID | TBD range | yes
+Available Listings | Sorted list of listings provided to the client in response to a search query | yes
+Listing ID | Identifier for the listing | yes
+Neighbourhood ID | Identifier for the neighbourhood | yes
+Room Type | string | yes
+Amenities | List of amenity IDs | yes
+Nightly Prices | list | yes
+Date | date | yes
+Price | float | yes
+Average Rating | Float (NULL of number of reviews = 0) | yes
+Recommendation Weight | Object | yes
 
-# Booking Details (from Inventory)
+### Booking Details (from Inventory)
 Booking details are provided when a booking is performed. The booking is consumed by Inventory, and Inventory adds on additional values related to the listing.
 
-
-Property
-Possible Values
-Required
-Listing ID
-Identifier for the listing
-yes
-User ID
-(coordinate range with Behaviour)
-yes
-Search ID
-Identifier for search
-yes
-Neighbourhood
-Identifier for the neighbourhood
-yes
-Room Type
-string
-yes
-Amenities
-List of amenity IDs
-yes
-Nightly Prices
-list
-yes
-        Date
-date
-yes
-        Price
-float
-yes
-Average Rating
-Float (NULL of number of reviews = 0)
-yes
+Property | Possible Values | Required
+---------|-----------------|----------
+Listing ID | Identifier for the listing | yes
+User ID | (coordinate range with Behaviour) | yes
+Search ID | Identifier for search | yes
+Neighbourhood | Identifier for the neighbourhood | yes
+Room Type | string | yes
+Amenities | List of amenity IDs | yes
+Nightly Prices | list | yes
+Date | date | yes
+Price | float | yes
+Average Rating | Float (NULL of number of reviews = 0) | yes
 
 
 
@@ -137,7 +94,7 @@ yes
 
 ## Messages Published
 
-# Sort Order Scores 
+### Sort Order Scores 
 If there are no values provided for coefficients, assume weight is 1.0. The sort order scores are used by the search service to sort search results.
 
 Subscribers: Search Service
@@ -163,7 +120,7 @@ type | string | no
 coefficient | float (-2.00 - 2.00) | no
 rating | float (-2.00 - 2.00)| no
 
-#Format 
+### Format 
 
 For example, a scoring update message could look like:
 ```javascript
