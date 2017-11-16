@@ -36,6 +36,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 
 ## System Service Architecture
 
+![System Service Architecture](https://github.com/model-airbnb/Recommendation/blob/master/docs/images/image2.jpg "System Service Architecture")
+
 <img src="./docs/images/image2.png">
 
 ## Messages Consumed
