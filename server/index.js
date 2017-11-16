@@ -16,6 +16,6 @@ const { PORT } = process.env;
 fetchSearchMessages();
 fetchBookingMessages();
 setInterval(() => fetchSearchMessages(), 300000);
-setInterval(() => fetchBookingMessages(), 300000);
+setInterval(() => fetchBookingMessages(), 100000);
 
 app.listen(PORT, () => { console.log(`Listening on port ${PORT}`); });
