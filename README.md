@@ -21,7 +21,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 
 ## Usage
 
-> Some usage instructions
+To install, run the following commands. Make sure to update the proper locations for Elastic Search, Postgres, Redis, and SQS Services.
+
+```
+npm install
+```
 
 ## Requirements
 
