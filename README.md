@@ -16,6 +16,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 1. [Usage](#Usage)
 1. [Requirements](#requirements)
 1. [Development](#development)
+1. [System Overview](#system-overview)
 1. [System Service Architecture](#system-service-architecture)
 1. [Messages Consumed](#messages-consumed)
     1. [Search Query (from Search Service)](#search-query)
@@ -47,11 +48,19 @@ npm install
 - winston 3.0.0-rc1
 - winston-elasticsearch 0.5.3
 
+## System Overview
+
+### Data Flow Diagram
+![Data Flow Diagram](https://github.com/model-airbnb/Recommendation/blob/master/docs/images/dataflow.jpg "Data Flow Diagram")
+
+### Sequence Diagram
+![Sequence Diagram](https://github.com/model-airbnb/Recommendation/blob/master/docs/images/dataflow.jpg "Sequence Diagram")
+
+
 ## System Service Architecture
 
 ![System Service Architecture](https://github.com/model-airbnb/Recommendation/blob/master/docs/images/image2.jpg "System Service Architecture")
 
-<img src="./docs/images/image2.png">
 
 ## Messages Consumed
 
