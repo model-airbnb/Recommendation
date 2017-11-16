@@ -51,10 +51,10 @@ npm install
 ## System Overview
 
 ### Data Flow Diagram
-![Data Flow Diagram](https://github.com/model-airbnb/Recommendation/blob/master/docs/images/dataflow.jpg "Data Flow Diagram")
+![Data Flow Diagram](https://github.com/model-airbnb/Recommendation/blob/master/docs/images/dataflow.png "Data Flow Diagram")
 
 ### Sequence Diagram
-![Sequence Diagram](https://github.com/model-airbnb/Recommendation/blob/master/docs/images/dataflow.jpg "Sequence Diagram")
+![Sequence Diagram](https://github.com/model-airbnb/Recommendation/blob/master/docs/images/sequencediagram.png "Sequence Diagram")
 
 
 ## System Service Architecture
