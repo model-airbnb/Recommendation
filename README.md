@@ -21,7 +21,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 
 ## Usage
 
-> Some usage instructions
+To install, run the following commands. Make sure to update the proper locations for Elastic Search, Postgres, Redis, and SQS Services.
+
+```
+npm install
+```
 
 ## Requirements
 
@@ -56,7 +60,7 @@ Room Type | string | no
 Amenities | List of amenity IDs | no
 Neighbourhood ID | TBD range | no
 
-## Search Results (from Search Service)
+### Search Results (from Search Service)
 Search results are consumed to see what results are actually being published after the weights, and whether those do lead to purchases. 
 
 Property | Possible Values | Required
@@ -88,10 +92,6 @@ Nightly Prices | list | yes
 Date | date | yes
 Price | float | yes
 Average Rating | Float (NULL of number of reviews = 0) | yes
-
-
-
-
 
 
 ## Messages Published
@@ -143,9 +143,13 @@ For example, a scoring update message could look like:
   }
 ]
 ```
+## Schema Design
 
+### Inventory Service Schema
+![Inventory Service Schema](https://github.com/model-airbnb/Recommendation/blob/master/docs/images/image3.jpg "Inventory Service Schema")
 
-
+### Recommendation Service Schema
+![Recommendation Service Schema](https://github.com/model-airbnb/Recommendation/blob/master/docs/images/image1.jpg "Recommendation Service Schema")
 
 
 
